@@ -3,18 +3,16 @@
 import numpy as np
 
 from scipy.special import gamma,psi
-from scipy import ndimage
 from scipy.linalg import det
 from numpy import pi
-
 from sklearn.neighbors import NearestNeighbors
 
-__all__=['entropy', 'mutual_information', 'entropy_gaussian']
+# __all__=['entropy', 'mutual_information', 'entropy_gaussian']
+#
+# EPS = np.finfo(float).eps
 
-EPS = np.finfo(float).eps
 
-
-def nearest_distances(X, k=1):
+def _nearest_distances(X, k=1):
     '''
     X = array(N,M)
     N = number of points
@@ -28,7 +26,7 @@ def nearest_distances(X, k=1):
     return d[:, -1] # returns the distance to the kth nearest neighbor
 
 
-def entropy_gaussian(C):
+def _entropy_gaussian(C):
     '''
     Entropy of a gaussian variable with covariance matrix C
     '''
@@ -39,7 +37,7 @@ def entropy_gaussian(C):
         return .5*n*(1 + np.log(2*pi)) + .5*np.log(abs(det(C)))
 
 
-def entropy(X, k=1):
+def _entropy(X, k=1):
     ''' Returns the entropy of the X.
 
     Parameters
@@ -64,7 +62,7 @@ def entropy(X, k=1):
     '''
 
     # Distance to kth nearest neighbor
-    r = nearest_distances(X, k) # squared distances
+    r = _nearest_distances(X, k) # squared distances
     n, d = X.shape
     volume_unit_ball = (pi**(.5*d)) / gamma(.5*d + 1)
     '''
@@ -95,7 +93,7 @@ def mutual_information(variables, k=1):
         raise AttributeError(
                 "Mutual information must involve at least 2 variables")
     all_vars = np.hstack(variables)
-    return (sum([entropy(X, k=k) for X in variables])
-            - entropy(all_vars, k=k))
+    return (sum([_entropy(X, k=k) for X in variables])
+            - _entropy(all_vars, k=k))
 
 
