@@ -114,9 +114,9 @@ def mutual_kde(x, y, type_bandwidth='scott'):
 
     Notes:
     Bandwidth make influence on the KDE estimation. We use Scott's rule,
-    'scott', that is default paraeter in 'gaussian_kde'
+    'scott', that is default parameter in 'gaussian_kde'
     """
-
+    # TODO clarify if we need 'type_bandwidth'
 
     xmin = x.min() - 0.1 * (x.max() - x.min())
     xmax = x.max() + 0.1 * (x.max() - x.min())
@@ -125,32 +125,60 @@ def mutual_kde(x, y, type_bandwidth='scott'):
 
     Xm, Ym = np.mgrid[xmin:xmax:100j, ymin:ymax:100j]
     XYm = np.c_[Xm.ravel(), Ym.ravel()]
-
     xy = np.c_[x, y]
+
     bandwidth = 'scott'
+
     kde_xy = gaussian_kde(xy.T, bw_method=bandwidth)
     kde_x = gaussian_kde(x.ravel(), bw_method=bandwidth)
     kde_y = gaussian_kde(y.ravel(), bw_method=bandwidth)
 
-    if type_bandwidth == '2scott':
-        kde_xy.set_bandwidth(bw_method=bandwidth)
-        kde_xy.set_bandwidth(bw_method=kde_xy.factor * 2.0)
+    dict_bandwidth = {'scott': 1.0, '2scott': 2.0, '05scott': 0.5}
+    coef_bandwidth = dict_bandwidth[type_bandwidth]
 
-        kde_x.set_bandwidth(bw_method=bandwidth)
-        kde_x.set_bandwidth(bw_method=kde_x.factor * 2.0)
+    kde_xy.set_bandwidth(bw_method=bandwidth)
+    kde_xy.set_bandwidth(bw_method=kde_xy.factor * coef_bandwidth)
 
-        kde_y.set_bandwidth(bw_method=bandwidth)
-        kde_y.set_bandwidth(bw_method=kde_y.factor * 2.0)
+    kde_x.set_bandwidth(bw_method=bandwidth)
+    kde_x.set_bandwidth(bw_method=kde_x.factor * coef_bandwidth)
 
-    if type_bandwidth == '05scott':
-        kde_xy.set_bandwidth(bw_method=bandwidth)
-        kde_xy.set_bandwidth(bw_method=kde_xy.factor * 0.5)
+    kde_y.set_bandwidth(bw_method=bandwidth)
+    kde_y.set_bandwidth(bw_method=kde_y.factor * coef_bandwidth)
 
-        kde_x.set_bandwidth(bw_method=bandwidth)
-        kde_x.set_bandwidth(bw_method=kde_x.factor * 0.5)
 
-        kde_y.set_bandwidth(bw_method=bandwidth)
-        kde_y.set_bandwidth(bw_method=kde_y.factor * 0.5)
+    # if type_bandwidth != 'scott':
+    #     dict_bandwidth = {'2scott': 2.0, '05scott': 0.5}
+    #     coef_bandwidth = dict_bandwidth[type_bandwidth]
+    #
+    #     kde_xy.set_bandwidth(bw_method=bandwidth)
+    #     kde_xy.set_bandwidth(bw_method=kde_xy.factor * coef_bandwidth)
+    #
+    #     kde_x.set_bandwidth(bw_method=bandwidth)
+    #     kde_x.set_bandwidth(bw_method=kde_x.factor * coef_bandwidth)
+    #
+    #     kde_y.set_bandwidth(bw_method=bandwidth)
+    #     kde_y.set_bandwidth(bw_method=kde_y.factor * coef_bandwidth)
+
+
+    # if type_bandwidth == '2scott':
+    #     kde_xy.set_bandwidth(bw_method=bandwidth)
+    #     kde_xy.set_bandwidth(bw_method=kde_xy.factor * 2.0)
+    #
+    #     kde_x.set_bandwidth(bw_method=bandwidth)
+    #     kde_x.set_bandwidth(bw_method=kde_x.factor * 2.0)
+    #
+    #     kde_y.set_bandwidth(bw_method=bandwidth)
+    #     kde_y.set_bandwidth(bw_method=kde_y.factor * 2.0)
+    #
+    # if type_bandwidth == '05scott':
+    #     kde_xy.set_bandwidth(bw_method=bandwidth)
+    #     kde_xy.set_bandwidth(bw_method=kde_xy.factor * 0.5)
+    #
+    #     kde_x.set_bandwidth(bw_method=bandwidth)
+    #     kde_x.set_bandwidth(bw_method=kde_x.factor * 0.5)
+    #
+    #     kde_y.set_bandwidth(bw_method=bandwidth)
+    #     kde_y.set_bandwidth(bw_method=kde_y.factor * 0.5)
 
     # Mutual information
     kde_xy_values = kde_xy(XYm.T)
