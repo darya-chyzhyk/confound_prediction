@@ -2,7 +2,8 @@ import numpy as np
 
 from confound_isolating.mutual_information import (_entropy,
                                                    _entropy_gaussian,
-                                                   mutual_information)
+                                                   mutual_information,
+                                                   mutual_kde)
 
 
 
@@ -51,3 +52,29 @@ def test_mutual_information():
     np.testing.assert_array_less(MI_est, MI_th)
     np.testing.assert_array_less(MI_th, MI_est  + .3)
 
+
+def test_mutual_kde():
+
+    # Uncorrelated values
+    xx = np.array([-1,1])
+    yy = np.array([0, 10])
+    means = [xx.mean(), yy.mean()]
+    stds = [xx.std() / 3, yy.std() / 3]
+    corr = 0.01  # correlation
+    covs = [[stds[0] ** 2, stds[0] * stds[1] * corr],
+            [stds[0] * stds[1] * corr, stds[1] ** 2]]
+
+    x_uncor, y_uncor = np.random.multivariate_normal(means, covs, 1000).T
+    print('Mutual information uncorrelated variables: ', mutual_kde(x_uncor,
+                                                                    y_uncor,
+                                                                    type_bandwidth='scott'))
+    # Correlated values
+
+    corr = 0.9  # correlation
+    covs = [[stds[0] ** 2, stds[0] * stds[1] * corr],
+            [stds[0] * stds[1] * corr, stds[1] ** 2]]
+
+    x_corr, y_corr = np.random.multivariate_normal(means, covs, 1000).T
+    print('Mutual information correlated variables: ', mutual_kde(x_corr,
+                                                                  y_corr,
+                                                                  type_bandwidth='scott'))
