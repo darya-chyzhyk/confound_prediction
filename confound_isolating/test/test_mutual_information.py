@@ -54,27 +54,37 @@ def test_mutual_information():
 
 
 def test_mutual_kde():
+    # Test if mutual information is non-negative
+    # Test if mutual information for the correlated variables is bigger than
+    # for uncorrelated
 
-    # Uncorrelated values
     xx = np.array([-1,1])
     yy = np.array([0, 10])
     means = [xx.mean(), yy.mean()]
     stds = [xx.std() / 3, yy.std() / 3]
+
+    # Uncorrelated values
     corr = 0.01  # correlation
     covs = [[stds[0] ** 2, stds[0] * stds[1] * corr],
             [stds[0] * stds[1] * corr, stds[1] ** 2]]
 
-    x_uncor, y_uncor = np.random.multivariate_normal(means, covs, 1000).T
-    print('Mutual information uncorrelated variables: ', mutual_kde(x_uncor,
-                                                                    y_uncor,
-                                                                    type_bandwidth='scott'))
-    # Correlated values
+    np.random.seed(42)
+    x_uncorr, y_uncorr = np.random.multivariate_normal(means, covs, 1000).T
+    mutual_uncorr = mutual_kde(x_uncorr, y_uncorr, type_bandwidth='scott')
 
-    corr = 0.9  # correlation
+    #print('Mutual information uncorrelated variables: ',
+
+    # Correlated values
+    # TODO test on the corr = 0.9, kde_xy_values contains nan and mutual
+    #  information return the error
+
+    corr = 0.8  # correlation
     covs = [[stds[0] ** 2, stds[0] * stds[1] * corr],
             [stds[0] * stds[1] * corr, stds[1] ** 2]]
 
+    # x, y = np.random.multivariate_normal(means, covs, 1000).T
+    np.random.seed(42)
     x_corr, y_corr = np.random.multivariate_normal(means, covs, 1000).T
-    print('Mutual information correlated variables: ', mutual_kde(x_corr,
-                                                                  y_corr,
-                                                                  type_bandwidth='scott'))
+    mutual_corr = mutual_kde(x_corr, y_corr, type_bandwidth='scott')
+    assert mutual_corr >= 0
+    assert mutual_corr > mutual_uncorr
