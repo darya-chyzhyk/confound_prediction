@@ -6,6 +6,7 @@ from scipy.special import gamma,psi
 from scipy.linalg import det
 from numpy import pi
 from sklearn.neighbors import NearestNeighbors
+from scipy.stats.kde import gaussian_kde
 
 # __all__=['entropy', 'mutual_information', 'entropy_gaussian']
 #
@@ -96,4 +97,68 @@ def mutual_information(variables, k=1):
     return (sum([_entropy(X, k=k) for X in variables])
             - _entropy(all_vars, k=k))
 
+
+def mutual_kde(x, y, type_bandwidth='scott'):
+    """Mutual information estimated as cumulative sum  of ratio
+     P(x)P(y)/P(x,y)
+     The probability density functions we estimate with kernel-dencity
+     estimator (KDE) using Gaussian kernels.
+
+    :param x: numpy.array, shape (n_samples)
+    :param y: numpy.array, shape (n_samples)
+    :param type_bandwidth: str, scalar or callable, optional
+        The method used to calculate the estimator bandwidth.  This can be
+        'scott', '2scott', '05scott'
+    :return: float
+        Mutual information, a non-negative value
+
+    Notes:
+    Bandwidth make influence on the KDE estimation. We use Scott's rule,
+    'scott', that is default paraeter in 'gaussian_kde'
+    """
+
+
+    xmin = x.min() - 0.1 * (x.max() - x.min())
+    xmax = x.max() + 0.1 * (x.max() - x.min())
+    ymin = y.min() - 0.1 * (y.max() - y.min())
+    ymax = y.max() + 0.1 * (y.max() - y.min())
+
+    Xm, Ym = np.mgrid[xmin:xmax:100j, ymin:ymax:100j]
+    XYm = np.c_[Xm.ravel(), Ym.ravel()]
+
+    xy = np.c_[x, y]
+    bandwidth = 'scott'
+    kde_xy = gaussian_kde(xy.T, bw_method=bandwidth)
+    kde_x = gaussian_kde(x.ravel(), bw_method=bandwidth)
+    kde_y = gaussian_kde(y.ravel(), bw_method=bandwidth)
+
+    if type_bandwidth == '2scott':
+        kde_xy.set_bandwidth(bw_method=bandwidth)
+        kde_xy.set_bandwidth(bw_method=kde_xy.factor * 2.0)
+
+        kde_x.set_bandwidth(bw_method=bandwidth)
+        kde_x.set_bandwidth(bw_method=kde_x.factor * 2.0)
+
+        kde_y.set_bandwidth(bw_method=bandwidth)
+        kde_y.set_bandwidth(bw_method=kde_y.factor * 2.0)
+
+    if type_bandwidth == '05scott':
+        kde_xy.set_bandwidth(bw_method=bandwidth)
+        kde_xy.set_bandwidth(bw_method=kde_xy.factor * 0.5)
+
+        kde_x.set_bandwidth(bw_method=bandwidth)
+        kde_x.set_bandwidth(bw_method=kde_x.factor * 0.5)
+
+        kde_y.set_bandwidth(bw_method=bandwidth)
+        kde_y.set_bandwidth(bw_method=kde_y.factor * 0.5)
+
+    # Mutual information
+    kde_xy_values = kde_xy(XYm.T)
+    mutual_information = np.sum(kde_xy_values *
+                                (np.log((kde_xy_values /
+                                         (kde_x(Xm[:, 0])[:, np.newaxis] *
+                                          kde_y(Ym[0])).ravel())
+                                        ) + 1e-4)
+                                )
+    return mutual_information
 
