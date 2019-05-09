@@ -5,8 +5,15 @@ from confound_isolating.data_simulation import simulate_confounded_data
 # Simulate data
 X, y, z, = simulate_confounded_data(link_type='direct_link', n_samples=100,
                           n_features=100)
-
 ids = list(range(0, y.shape[0]))
+
+# Pre-deconfounding if neccessery
+
+if do_conf_regressout is 'jointly':
+    X = clean(X, standardize=False, detrend=False,
+                    confounds=z, low_pass=None, high_pass=None)
+
+
 
 
 # Sampling
