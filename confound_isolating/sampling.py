@@ -16,14 +16,20 @@ from sklearn.datasets.base import Bunch
 # 2) confon izolation
 
 def random_index_2remove(y, z):
+    """
+    Function to select 4 random indexes to remove
+    :param y: numpy.array, target
+    :param z: numpy.array, confound
+    :return: numpy.array, index to be removed
+    """
     y_train, y_test, z_train, z_test, index_train, index_test = \
         train_test_split(y, z, np.arange(y.shape[0]), test_size=0.25,
                          random_state=42)
-    ratio_dens, kde_y, kde_z, kde_yz, scale_method = [0, 0, 0, 0, 0]
-    index_test_remove = np.random.choice(index_test, 4, replace=False)
+    #ratio_dens, kde_y, kde_z, kde_yz, scale_method = [0, 0, 0, 0, 0]
+    index_2remove = np.random.choice(index_test, 4, replace=False)
 
     # TODO for the output keep just index_to_remove
-    return ratio_dens, index_test_remove, kde_y, kde_z, kde_yz, scale_method
+    return index_2remove,
 
 
 def confound_izolating_index_2remove(y, z, prng=None):
@@ -64,18 +70,17 @@ def confound_izolating_index_2remove(y, z, prng=None):
         random_quantiles = prng.rand(4) * empirical_cdf.max()
     idx_to_reject = np.searchsorted(empirical_cdf, random_quantiles,
                                     side='left')
-    ratio_remove = ratio_dens[index_sort[idx_to_reject]]
     # index from test subset to remove
-    index_test_remove = index_test[index_sort[idx_to_reject]]
+    index_2remove = index_test[index_sort[idx_to_reject]]
 
-    return ratio_dens, ratio_remove, index_test_remove, kde_y, kde_z, kde_yz
-
-
+    return index_2remove
 
 
-def confound_izolating_sampling(x, y, type_sampling, prng=None):
+
+
+def sampling_with_kde(x, y, type_sampling, prng=None):
     # TODO split into 2 functions
-    #sampling_with_kde
+    # confound_izolating_sampling
     '''
 
     :param x: numpy.array
@@ -144,7 +149,7 @@ def confound_izolating_sampling(x, y, type_sampling, prng=None):
 
 
 
-def sampling(y, z, ids, type_sampling='sampling_cumsum', n_seed=0,
+def confound_izolating_sampling(y, z, ids, type_sampling='sampling_cumsum', n_seed=0,
              min_size=None, save_mi_iter=False, type_bandwidth='scott'):
 
     # TODO do we need 'type _bandwidth'?
