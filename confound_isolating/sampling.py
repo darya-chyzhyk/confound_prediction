@@ -15,30 +15,11 @@ from confound_isolating.mutual_information import mutual_kde
 
 # sampling_with_kde
 # split to
-# 1) randome
-# 2) confon izolation
-
-def random_index_2remove(y, z):
-    """
-    Function to select 4 random indexes to remove
-    :param y: numpy.array, shape (n_samples), target
-    :param z: numpy.array, shape (n_samples), confound
-    :return: numpy.array, shape (m_samples),
-        index to be removed, m < n
-    """
-    y_train, y_test, z_train, z_test, index_train, index_test = \
-        train_test_split(y, z, np.arange(y.shape[0]), test_size=0.25,
-                         random_state=42)
-    #ratio_dens, kde_y, kde_z, kde_yz, scale_method = [0, 0, 0, 0, 0]
-    index_to_remove = np.random.choice(index_test, 4, replace=False)
-
-    # TODO for the output keep just index_to_remove
-
-    # TODO make number (4) of removing samples as parameter?
-    return index_to_remove,
+# 1) confound isolation
+# 2) randome
 
 
-def confound_izolating_index_2remove(y, z, prng=None):
+def confound_isolating_index_2remove(y, z, prng=None):
 
     y_train, y_test, z_train, z_test, index_train, index_test = \
         train_test_split(y, z, np.arange(y.shape[0]), test_size=0.25,
@@ -81,6 +62,92 @@ def confound_izolating_index_2remove(y, z, prng=None):
 
     return index_to_remove
 
+
+def random_index_2remove(y, z):
+    """
+    Function to select 4 random indexes to remove
+    :param y: numpy.array, shape (n_samples), target
+    :param z: numpy.array, shape (n_samples), confound
+    :return: numpy.array, shape (m_samples),
+        index to be removed, m < n
+    """
+    y_train, y_test, z_train, z_test, index_train, index_test = \
+        train_test_split(y, z, np.arange(y.shape[0]), test_size=0.25,
+                         random_state=42)
+    #ratio_dens, kde_y, kde_z, kde_yz, scale_method = [0, 0, 0, 0, 0]
+    index_to_remove = np.random.choice(index_test, 4, replace=False)
+
+    # TODO for the output keep just index_to_remove
+
+    # TODO make number (4) of removing samples as parameter?
+    return index_to_remove,
+
+
+
+
+def confound_isolating_sampling(y, z, n_seed=0, min_sample_size=None,
+                                type_bandwidth='scott'):
+    """
+    Sampling method based on the 'Confound izilating cross-calidation'
+    technique.
+    Refere to the paper
+
+    :param y: numpy.array, shape (n_samples), target
+    :param z: numpy.array, shape (n_samples), confound
+    :param n_seed: int
+        Random seed used to initialize the pseudo-random number generator.
+        Can be any integer between 0 and 2**32 - 1 inclusive. Defaul is '0'
+    :param min_sample_size: float
+        Minimum sample size to be reached, default is 10% of the data
+    :param type_bandwidth: str, scalar or callable, optional
+        The method used to calculate the estimator bandwidth.  This can be
+        'scott', '2scott', '05scott'
+    :return:
+    """
+
+    # TODO do we need 'type _bandwidth'?
+
+    ids = list(range(0, y.shape[0]))
+
+    mi_list = []
+    corr_list = []
+    n_iter = 0
+    index_to_remove = []
+
+    array_data = np.c_[y, z, ids]
+    if min_sample_size is None:
+        min_size = np.int(y.shape[0] / 10)
+    else:
+        min_size = np.int(y.shape[0] * min_sample_size / 100)
+
+    while array_data.shape[0] > min_size:
+        n_iter = n_iter + 1
+        # remove subject from the previous iteration
+        array_data = np.delete(array_data, index_to_remove, axis=0)
+        y_sampling = array_data[:, 0]
+        z_sampling = array_data[:, 1]
+
+        # control the pseudo random number generator
+        prng = np.random.RandomState(seed=n_seed)
+
+        # return indexes
+        index_to_remove = confound_isolating_index_2remove(y, z, prng=prng)
+
+    # The case when target and confound are equal
+    if np.all(y_sampling==z_sampling) == True:
+        mi_list.append('NaN')
+    else:
+        mi_list.append(mutual_kde(y_sampling.astype(float),
+                                  z_sampling.astype(float),
+                                  type_bandwidth=type_bandwidth))
+    corr_list.append(np.corrcoef(y_sampling.astype(float),
+                                 z_sampling.astype(float))[0, 1])
+
+    sampled_set = {'sampled_index': array_data[:, 2],
+                   'mutual_information': mi_list,
+                   'correlation': corr_list}
+
+    return Bunch(**sampled_set)
 
 
 
@@ -128,75 +195,12 @@ def random_sampling(y, z, min_sample_size=None, type_bandwidth='scott'):
 
 
 
-def confound_izolating_sampling(y, z, n_seed=0, min_sample_size=None,
-                                type_bandwidth='scott'):
-    """
-    Sampling method based on the 'Confound izilating cross-calidation'
-    technique.
-    Refere to the paper
 
-    :param y: numpy.array, shape (n_samples), target
-    :param z: numpy.array, shape (n_samples), confound
-    :param n_seed: int
-        Random seed used to initialize the pseudo-random number generator.
-        Can be any integer between 0 and 2**32 - 1 inclusive. Defaul is '0'
-    :param min_sample_size: float
-        Minimum sample size to be reached, default is 10% of the data
-    :param type_bandwidth: str, scalar or callable, optional
-        The method used to calculate the estimator bandwidth.  This can be
-        'scott', '2scott', '05scott'
-    :return:
-    """
-
-    # TODO do we need 'type _bandwidth'?
-
-    ids = list(range(0, y.shape[0]))
-
-    mi_list = []
-    corr_list = []
-    n_iter = 0
-    index_to_remove = []
-
-    array_data = np.c_[y, z, ids]
-    if min_sample_size is None:
-        min_size = np.int(y.shape[0] / 10)
-    else:
-        min_size = np.int(y.shape[0] * min_sample_size / 100)
-
-    while array_data.shape[0] > min_size:
-        n_iter = n_iter + 1
-        # remove subject from the previous iteration
-        array_data = np.delete(array_data, index_to_remove, axis=0)
-        y_sampling = array_data[:, 0]
-        z_sampling = array_data[:, 1]
-
-        # control the pseudo random number generator
-        prng = np.random.RandomState(seed=n_seed)
-
-        # return indexes
-        index_to_remove = confound_izolating_index_2remove(y, z, prng=prng)
-
-    # The case when target and confound are equal
-    if np.all(y_sampling==z_sampling) == True:
-        mi_list.append('NaN')
-    else:
-        mi_list.append(mutual_kde(y_sampling.astype(float),
-                                  z_sampling.astype(float),
-                                  type_bandwidth=type_bandwidth))
-    corr_list.append(np.corrcoef(y_sampling.astype(float),
-                                 z_sampling.astype(float))[0, 1])
-
-    sampled_set = {'sampled_index': array_data[:, 2],
-                   'mutual_information': mi_list,
-                   'correlation': corr_list}
-
-    return Bunch(**sampled_set)
-
-
+# Delete
 
 def sampling_with_kde(x, y, type_sampling, prng=None):
     # TODO split into 2 functions
-    # confound_izolating_sampling
+    # confound_isolating_sampling
     '''
 
     :param x: numpy.array
@@ -313,7 +317,7 @@ def confound_izolating_sampling_iterations(y, z, n_seed=0,
         prng = np.random.RandomState(seed=n_seed)
 
         # return indexes
-        index_to_remove = confound_izolating_index_2remove(y, z, prng=None)
+        index_to_remove = confound_isolating_index_2remove(y, z, prng=None)
         # ratio_dens, index_to_remove, kde_y, kde_z, kde_yz, scale_method = \
         #     sampling_with_kde(y_sampling, z_sampling, type_sampling, prng)
 
