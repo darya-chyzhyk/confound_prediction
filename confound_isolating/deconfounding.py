@@ -10,7 +10,8 @@ from sklearn.base import BaseEstimator, TransformerMixin, clone
 from sklearn.linear_model import LinearRegression
 
 class DeConfounder(BaseEstimator, TransformerMixin):
-    """ A transformer removing the effect of y on X.
+    """ A transformer removing the effect of y on X using
+    sklearn.linear_model.LinearRegression.
     """
 
     def __init__(self, confound_model=LinearRegression()):
@@ -33,9 +34,18 @@ class DeConfounder(BaseEstimator, TransformerMixin):
 
 
 
-def confound_isolating_cv(X, y, ids_sampled, n_permutations=None):
+def confound_isolating_cv(X, y, ids_sampled):
+    """
+    Function that create the test and training sets, masking the samples with
+    indexes obtained from the Confound Isolation sampling
 
-    # Create test and train sets
+    :param X: array-like, shape (n_samples, n_features)
+    :param y: array-like, shape (n_samples)
+    :param ids_sampled: list
+    :return: list of arrays,
+        train and test of X, y and ids
+    """
+
     x_test = []
     x_train = []
     y_test = []
@@ -43,25 +53,17 @@ def confound_isolating_cv(X, y, ids_sampled, n_permutations=None):
     ids_test = []
     ids_train = []
 
-
     ids = list(range(0, y.shape[0]))
 
     for index_list in ids_sampled:
         mask = np.isin(ids, index_list)
-        # test
-
-        y_test.append(y[mask])
-        ids_test.append(index_list)
-        #z_conf_test.append(z_conf[mask])
-        # train
-
-        y_train.append(y[~mask])
-        ids_train.append(np.array(ids)[~mask])
-        #z_conf_train.append(z_conf[~mask])
 
         x_test.append(X[mask])
         x_train.append(X[~mask])
-
+        y_test.append(y[mask])
+        y_train.append(y[~mask])
+        ids_test.append(index_list)
+        ids_train.append(np.array(ids)[~mask])
     return x_test, x_train, y_test, y_train, ids_test, ids_train
 
 
