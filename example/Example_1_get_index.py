@@ -2,8 +2,8 @@
 
 from confound_isolating.data_simulation import simulate_confounded_data
 from confound_isolating.sampling import (random_index_2remove,
-                                         confound_izolating_index_2remove,
-                                         confound_izolating_sampling)
+                                         confound_isolating_index_2remove,
+                                         confound_isolating_sampling)
 
 # Simulate data
 X, y, z, = simulate_confounded_data(link_type='direct_link', n_samples=100,
@@ -17,9 +17,9 @@ ids = list(range(0, y.shape[0]))
 #     random_index_2remove(y, z)
 #
 # ratio_dens, ratio_remove, index_test_remove, kde_y, kde_z, kde_yz = \
-#     confound_izolating_index_2remove(y, z)
+#     confound_isolating_index_2remove(y, z)
 
-sampled_set = confound_izolating_sampling(y, z, n_seed=0, min_sample_size=None,
+sampled_set = confound_isolating_sampling(y, z, n_seed=0, min_sample_size=None,
                                 type_bandwidth='scott')
 
 
