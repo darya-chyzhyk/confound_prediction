@@ -2,12 +2,14 @@
 1. Confound izolation cross validation
 2. Confound regress-out
     a. jointly
-    b. separatly
+    b. out-of-sample
 '''
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, clone
 from sklearn.linear_model import LinearRegression
+
+from scipy import linalg
 
 class DeConfounder(BaseEstimator, TransformerMixin):
     """ A transformer removing the effect of y on X using
@@ -57,7 +59,6 @@ def confound_isolating_cv(X, y, ids_sampled):
 
     for index_list in ids_sampled:
         mask = np.isin(ids, index_list)
-
         x_test.append(X[mask])
         x_train.append(X[~mask])
         y_test.append(y[mask])
@@ -70,7 +71,66 @@ def confound_isolating_cv(X, y, ids_sampled):
 
 
 
-def confound_regressout(y, type_deconfound, ids_sampled):
+def deconfound_jointly(signals, confounds):
+    """
+    Adapted code from the Nilern code
+    # TODO Check if give the same results
+
+    :param signals:
+    :param confounds:
+    :return:
+    """
+
+    # import numpy as np
+    # from scipy import linalg
+    # signals = np.copy(X)
+    # confounds = np.copy(z)
+
+
+
+    # Remove confounds
+
+    # TODO create _ensure_float function
+    # confounds = _ensure_float(confounds)
+    if not isinstance(confounds, (list, tuple)):
+        confounds = (confounds,)
+
+    all_confounds = []
+    for confound in confounds:
+
+        if isinstance(confound, np.ndarray):
+            if confound.ndim == 1:
+                confound = np.atleast_2d(confound).T
+            elif confound.ndim != 2:
+                raise ValueError("confound array has an incorrect number "
+                                 "of dimensions: %d" % confound.ndim)
+
+            if confound.shape[0] != signals.shape[0]:
+                raise ValueError("Confound signal has an incorrect length")
+        else:
+            raise TypeError("confound has an unhandled type: %s"
+                            % confound.__class__)
+        all_confounds.append(confound)
+
+    # Restrict the signal to the orthogonal of the confounds
+    confounds = np.hstack(all_confounds)
+    del all_confounds
+    # Improve numerical stability by controlling the range of
+    # confounds. We don't rely on _standardize as it removes any
+    # constant contribution to confounds.
+    confound_max = np.max(np.abs(confounds), axis=0)
+    confound_max[confound_max == 0] = 1
+    confounds /= confound_max
+
+    # Pivoting in qr decomposition was added in scipy 0.10
+    Q, R, _ = linalg.qr(confounds, mode='economic', pivoting=True)
+    Q = Q[:, np.abs(np.diag(R)) > np.finfo(np.float).eps * 100.]
+    signals -= Q.dot(Q.T).dot(signals)
+
+    return signals
+
+
+def confound_regressout(X, y, z, ids_sampled, type_deconfound):
     # Create test and train sets
     x_test = []
     x_train = []
@@ -95,34 +155,23 @@ def confound_regressout(y, type_deconfound, ids_sampled):
         ids_train.append(np.array(ids)[~mask])
         #z_conf_train.append(z_conf[~mask])
 
-        if do_conf_regressout is 'separately':
-            x_test.append(clean(X_brain[mask], standardize=False, detrend=False,
-                           confounds=z_conf[mask], low_pass=None,
-                           high_pass=None))
 
-            x_train.append(clean(X_brain[~mask], standardize=False,
-                                 detrend=False,
-                            confounds=z_conf[~mask], low_pass=None,
-                            high_pass=None))
-        elif do_conf_regressout is 'model_confounds':
+        if type_deconfound is 'out_of_sample':
 
             # train test
 
 
             deconfounder = DeConfounder()
-            deconfounder.fit(X_brain[~mask], z_conf[~mask])
-            x_test.append(deconfounder.transform(X_brain[mask], z_conf[mask]))
-            x_train.append(X_brain[~mask])
+            deconfounder.fit(X[~mask], z[~mask])
+            x_test.append(deconfounder.transform(X[mask], z[mask]))
+            x_train.append(X[~mask])
 
-            if deconfound_y is True:
-                y = clean(y, standardize=False, detrend=False,
-                          confounds=z_conf, low_pass=None,
-                          high_pass=None)
 
-        elif (do_conf_regressout is 'jointly') or (do_conf_regressout is
+
+        elif (type_deconfound is 'jointly') or (type_deconfound is
                                                        'False'):
-            x_test.append(X_brain[mask])
-            x_train.append(X_brain[~mask])
+            x_test.append([mask])
+            x_train.append(X[~mask])
 
 
 
