@@ -74,22 +74,20 @@ def confound_isolating_cv(X, y, ids_sampled):
 def deconfound_jointly(signals, confounds):
     """
     Adapted code from the Nilern code
-    # TODO Check if give the same results
 
-    :param signals:
-    :param confounds:
-    :return:
+    :param signals: numpy.ndarray
+        Timeseries. Must have shape (instant number, features number).
+    :param confounds:numpy.ndarray or list of Confounds timeseries.
+        Shape must be (instant number, confound number), or just
+        (instant number,) The number of time instants in signals and confounds
+        must be identical (i.e. signals.shape[0] == confounds.shape[0]).
+        If a list is provided, all confounds are removed from the input signal,
+        as if all were in the same array.
+    :return: numpy.ndarray
+    Input signals, deconfounded. Same shape as signals.
     """
 
-    # import numpy as np
-    # from scipy import linalg
-    # signals = np.copy(X)
-    # confounds = np.copy(z)
-
-
-
     # Remove confounds
-
     # TODO create _ensure_float function
     # confounds = _ensure_float(confounds)
     if not isinstance(confounds, (list, tuple)):
@@ -97,14 +95,12 @@ def deconfound_jointly(signals, confounds):
 
     all_confounds = []
     for confound in confounds:
-
         if isinstance(confound, np.ndarray):
             if confound.ndim == 1:
                 confound = np.atleast_2d(confound).T
             elif confound.ndim != 2:
                 raise ValueError("confound array has an incorrect number "
                                  "of dimensions: %d" % confound.ndim)
-
             if confound.shape[0] != signals.shape[0]:
                 raise ValueError("Confound signal has an incorrect length")
         else:
@@ -115,6 +111,7 @@ def deconfound_jointly(signals, confounds):
     # Restrict the signal to the orthogonal of the confounds
     confounds = np.hstack(all_confounds)
     del all_confounds
+
     # Improve numerical stability by controlling the range of
     # confounds. We don't rely on _standardize as it removes any
     # constant contribution to confounds.
