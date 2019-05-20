@@ -11,7 +11,8 @@ from sklearn.linear_model import LinearRegression
 
 from scipy import linalg
 
-from confound_isolating.sampling import random_sampling
+from confound_isolating.sampling import (random_sampling,
+                                         confound_isolating_sampling)
 
 class DeConfounder(BaseEstimator, TransformerMixin):
     """ A transformer removing the effect of y on X using
@@ -38,16 +39,16 @@ class DeConfounder(BaseEstimator, TransformerMixin):
 
 
 
-def confound_isolating_cv(X, y, ids_sampled):
+def confound_isolating_cv(X, y, z):
     """
     Function that create the test and training sets, masking the samples with
     indexes obtained from the Confound Isolation sampling
 
     :param X: array-like, shape (n_samples, n_features)
-    :param y: array-like, shape (n_samples)
-    :param ids_sampled: list
+    :param y: array-like, shape (n_samples), target
+    :param z: numpy.array, shape (n_samples), confound: list
     :return: list of arrays,
-        train and test of X, y and ids
+        train and test of X, y and sampled indexes
     """
 
     x_test = []
@@ -56,7 +57,9 @@ def confound_isolating_cv(X, y, ids_sampled):
     y_train = []
     ids_test = []
     ids_train = []
-
+    ids_sampled = confound_isolating_sampling(y, z, n_seed=0,
+                                            min_sample_size=None,
+                                type_bandwidth='scott')
     ids = list(range(0, y.shape[0]))
 
     for index_list in ids_sampled:
@@ -129,7 +132,18 @@ def deconfound_model_agnostic(signals, confounds):
     return signals
 
 
-def confound_regressout(X, y, z, type_deconfound, min_sample_size=None, type_bandwidth='scott'):
+def confound_regressout(X, y, z, type_deconfound, min_sample_size=None,
+                        type_bandwidth='scott'):
+    """
+
+    :param X: array-like, shape (n_samples, n_features)
+    :param y: array-like, shape (n_samples)
+    :param z:
+    :param type_deconfound:
+    :param min_sample_size:
+    :param type_bandwidth:
+    :return:
+    """
     # Model-agnostic
     # Out - of - sample
     # Create test and train sets
