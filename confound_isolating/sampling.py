@@ -156,8 +156,8 @@ def random_sampling(y, z, min_sample_size=None, type_bandwidth='scott'):
 
     ids = list(range(0, y.shape[0]))
 
-    mi_list = []
-    corr_list = []
+    mutual_information = []
+    correlation = []
     n_iter = 0
     index_to_remove = []
 
@@ -179,23 +179,25 @@ def random_sampling(y, z, min_sample_size=None, type_bandwidth='scott'):
 
     # The case when target and confound are equal
     if np.all(y_sampling == z_sampling) == True:
-        mi_list.append('NaN')
+        mutual_information.append('NaN')
     else:
-        mi_list.append(mutual_kde(y_sampling.astype(float),
+        mutual_information.append(mutual_kde(y_sampling.astype(float),
                                   z_sampling.astype(float),
                                   type_bandwidth=type_bandwidth))
-    corr_list.append(np.corrcoef(y_sampling.astype(float),
+    correlation.append(np.corrcoef(y_sampling.astype(float),
                                  z_sampling.astype(float))[0, 1])
 
-    sampled_set = {'sampled_index': array_data[:, 2],
-                   'mutual_information': mi_list,
-                   'correlation': corr_list}
+    # sampled_set = {'sampled_index': array_data[:, 2],
+    #                'mutual_information': mi_list,
+    #                'correlation': corr_list}
+    sampled_index = array_data[:, 2]
 
-    return Bunch(**sampled_set)
+    #return Bunch(**sampled_set)
+    return sampled_index, mutual_information, correlation
 
 
 
-
+############################################################################
 # Delete
 
 def sampling_with_kde(x, y, type_sampling, prng=None):
