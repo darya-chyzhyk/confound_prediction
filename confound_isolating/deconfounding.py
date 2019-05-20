@@ -11,6 +11,8 @@ from sklearn.linear_model import LinearRegression
 
 from scipy import linalg
 
+from confound_isolating.sampling import random_sampling
+
 class DeConfounder(BaseEstimator, TransformerMixin):
     """ A transformer removing the effect of y on X using
     sklearn.linear_model.LinearRegression.
@@ -71,9 +73,9 @@ def confound_isolating_cv(X, y, ids_sampled):
 
 
 
-def deconfound_jointly(signals, confounds):
+def deconfound_model_agnostic(signals, confounds):
     """
-    Adapted code from the Nilern code
+    Adapted code from the Nilern code for deconfounding jointly
 
     :param signals: numpy.ndarray
         Timeseries. Must have shape (instant number, features number).
@@ -127,7 +129,9 @@ def deconfound_jointly(signals, confounds):
     return signals
 
 
-def confound_regressout(X, y, z, ids_sampled, type_deconfound):
+def confound_regressout(X, y, z, type_deconfound, min_sample_size=None, type_bandwidth='scott'):
+    # Model-agnostic
+    # Out - of - sample
     # Create test and train sets
     x_test = []
     x_train = []
@@ -136,40 +140,42 @@ def confound_regressout(X, y, z, ids_sampled, type_deconfound):
     ids_test = []
     ids_train = []
 
+    # Pre-confounding
+    if type_deconfound == 'model_agnostic':
+        X = deconfound_model_agnostic(X, z)
 
+    # Sampling
+    ids_sampled, mutual_information, correlation = \
+        random_sampling(y, z, min_sample_size=min_sample_size,
+                        type_bandwidth=type_bandwidth)
     ids = list(range(0, y.shape[0]))
 
+    # Train and test sets
     for index_list in ids_sampled:
         mask = np.isin(ids, index_list)
+
         # test
-
         y_test.append(y[mask])
-        ids_test.append(index_list)
-        #z_conf_test.append(z_conf[mask])
-        # train
 
+        # train
         y_train.append(y[~mask])
         ids_train.append(np.array(ids)[~mask])
-        #z_conf_train.append(z_conf[~mask])
 
-
+        # Deconfound
         if type_deconfound is 'out_of_sample':
 
             # train test
-
-
             deconfounder = DeConfounder()
             deconfounder.fit(X[~mask], z[~mask])
             x_test.append(deconfounder.transform(X[mask], z[mask]))
             x_train.append(X[~mask])
 
-
-
-        elif (type_deconfound is 'jointly') or (type_deconfound is
+        elif (type_deconfound is 'model_agnostic') or (type_deconfound is
                                                        'False'):
             x_test.append([mask])
             x_train.append(X[~mask])
 
+    return x_test, x_train, y_test, y_train, ids_test, ids_train
 
 
 
