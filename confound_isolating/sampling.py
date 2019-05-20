@@ -20,6 +20,15 @@ from confound_isolating.mutual_information import mutual_kde
 
 
 def confound_isolating_index_2remove(y, z, prng=None):
+    """
+    The goal is to find a test set with independence between y and z
+
+    :param y: numpy.array, shape (n_samples), target
+    :param z: numpy.array, shape (n_samples), confound
+    :param prng: np.random.RandomState, default is None
+        Control the pseudo random number generator
+    :return: indexes to be removed
+    """
 
     y_train, y_test, z_train, z_test, index_train, index_test = \
         train_test_split(y, z, np.arange(y.shape[0]), test_size=0.25,
@@ -28,7 +37,7 @@ def confound_isolating_index_2remove(y, z, prng=None):
     yz_train = np.array((y_train, z_train))
     yz_test = np.array((y_test, z_test))
 
-    # scaling for kde
+    # Scaling for kde
     bandwidth = 'scott'
     scaler = preprocessing.StandardScaler()
     scaler.fit(yz_train.T)
@@ -37,7 +46,7 @@ def confound_isolating_index_2remove(y, z, prng=None):
     test_scaled = scaler.transform(yz_test.T).T
     kde_yz = gaussian_kde(train_scaled, bw_method=bandwidth)
 
-    # bandwidth: train and test on kde_yz, and use it for kde_y and kde_z
+    # Bandwidth: train and test on kde_yz, and use it for kde_y and kde_z
     bandwidth_xy = kde_yz.factor
     kde_y = gaussian_kde(train_scaled[0], bw_method=bandwidth_xy)
     kde_z = gaussian_kde(train_scaled[1], bw_method=bandwidth_xy)
@@ -46,18 +55,19 @@ def confound_isolating_index_2remove(y, z, prng=None):
     ratio_dens = (kde_yz(test_scaled)) / (kde_y(test_scaled[0]) * kde_z(
         test_scaled[1]))  # + 1e-4
 
-    # subjects to remove
+    # Subjects to remove
     index_sort = np.argsort(ratio_dens)
     ratio_sort = ratio_dens[np.argsort(ratio_dens)]
     empirical_cdf = (np.cumsum(ratio_sort)) ** 5
-
+    # TODO add parameters of number of descarded sunjects, at the moment is
+    #  a constant = 4
     if prng is None:
         random_quantiles = np.random.random(size=4) * empirical_cdf.max()
     else:
         random_quantiles = prng.rand(4) * empirical_cdf.max()
     idx_to_reject = np.searchsorted(empirical_cdf, random_quantiles,
                                     side='left')
-    # index from test subset to remove
+    # Index from test subset to be removed
     index_to_remove = index_test[index_sort[idx_to_reject]]
 
     return index_to_remove
