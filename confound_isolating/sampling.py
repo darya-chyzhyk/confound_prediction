@@ -72,9 +72,9 @@ def confound_isolating_index_2remove(y, z, prng=None):
                                     side='left')
     # Index from test subset to be removed
     index_to_remove = index_test[index_sort[idx_to_reject]]
-    stop
 
-    # TODO remove repetitions in the index to remove
+    # TODO remove repetitions in the index_to_remove, but not sure its
+    #  possible or important
 
     return index_to_remove
 
@@ -181,50 +181,53 @@ def confound_isolating_sampling(y, z, n_seed=0, min_sample_size=None,
 def random_sampling(y, z, min_sample_size=None, type_bandwidth='scott'):
 
 
-    ids = list(range(0, y.shape[0]))
+    sampled_index = list(range(0, y.shape[0]))
 
-    # mutual_information = []
-    # correlation = []
+    mutual_information = []
+    correlation = []
     n_iter = 0
     index_to_remove = []
 
-    array_data = np.c_[y, z, ids]
+    # array_data = np.c_[y, z, ids]
     if min_sample_size is None:
         min_size = np.int(y.shape[0] / 10)
     else:
         min_size = np.int(y.shape[0] * min_sample_size / 100)
 
-    while array_data.shape[0] > min_size:
+    while y.shape[0] > min_size:
         n_iter = n_iter + 1
         # remove subject from the previous iteration
-        array_data = np.delete(array_data, index_to_remove, axis=0)
-        y_sampling = array_data[:, 0]
-        z_sampling = array_data[:, 1]
+
+        # array_data = np.delete(array_data, index_to_remove, axis=0)
+        # y_sampling = array_data[:, 0]
+        # z_sampling = array_data[:, 1]
+        y = np.delete(y, index_to_remove, axis=0)
+        z = np.delete(z, index_to_remove, axis=0)
+        sampled_index = np.delete(sampled_index, index_to_remove, axis=0)
 
         # return indexes
         index_to_remove = random_index_2remove(y, z)
 
-    # The case when target and confound are equal
-    if np.all(y_sampling == z_sampling) == True:
-        # mutual_information.append('NaN')
-        mutual_information = 'NaN'
-    else:
-        # mutual_information.append(mutual_kde(y_sampling.astype(float),
-        #                           z_sampling.astype(float),
-        #                           type_bandwidth=type_bandwidth))
-        mutual_information = mutual_kde(y_sampling.astype(float),
-                                             z_sampling.astype(float),
-                                             type_bandwidth=type_bandwidth)
-    # correlation.append(np.corrcoef(y_sampling.astype(float),
-    #                              z_sampling.astype(float))[0, 1])
+        # The case when target and confound are equal
+        if np.all(y == z) == True:
+            # mutual_information.append('NaN')
+            mutual_information = 'NaN'
+        else:
+            mutual_information.append(mutual_kde(y.astype(float),
+                                                 z.astype(float),
+                                      type_bandwidth=type_bandwidth))
+            # mutual_information = mutual_kde(y_sampling.astype(float),
+            #                                      z_sampling.astype(float),
+            #                                      type_bandwidth=type_bandwidth)
+        correlation.append(np.corrcoef(y.astype(float), z.astype(float))[0, 1])
 
-    correlation = np.corrcoef(y_sampling.astype(float),
-                              z_sampling.astype(float))[0, 1]
+        # correlation = np.corrcoef(y_sampling.astype(float),
+        #                           z_sampling.astype(float))[0, 1]
 
-    # sampled_set = {'sampled_index': array_data[:, 2],
-    #                'mutual_information': mi_list,
-    #                'correlation': corr_list}
-    sampled_index = array_data[:, 2]
+        # sampled_set = {'sampled_index': array_data[:, 2],
+        #                'mutual_information': mi_list,
+        #                'correlation': corr_list}
+        # sampled_index = array_data[:, 2]
 
     #return Bunch(**sampled_set)
     return sampled_index, mutual_information, correlation
