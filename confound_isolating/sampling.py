@@ -26,8 +26,9 @@ def confound_isolating_index_2remove(y, z, prng=None):
     :param y: numpy.array, shape (n_samples), target
     :param z: numpy.array, shape (n_samples), confound
     :param prng: np.random.RandomState, default is None
-        Control the pseudo random number generator
-    :return: indexes to be removed
+        control the pseudo random number generator
+    :return: numpy.array, shape (m_samples),
+        index to be removed, m < n
     """
 
     y_train, y_test, z_train, z_test, index_train, index_test = \
@@ -59,8 +60,10 @@ def confound_isolating_index_2remove(y, z, prng=None):
     index_sort = np.argsort(ratio_dens)
     ratio_sort = ratio_dens[np.argsort(ratio_dens)]
     empirical_cdf = (np.cumsum(ratio_sort)) ** 5
+
     # TODO add parameters of number of descarded sunjects, at the moment is
     #  a constant = 4
+
     if prng is None:
         random_quantiles = np.random.random(size=4) * empirical_cdf.max()
     else:
@@ -81,26 +84,27 @@ def random_index_2remove(y, z):
     :return: numpy.array, shape (m_samples),
         index to be removed, m < n
     """
+
     y_train, y_test, z_train, z_test, index_train, index_test = \
         train_test_split(y, z, np.arange(y.shape[0]), test_size=0.25,
                          random_state=42)
-    #ratio_dens, kde_y, kde_z, kde_yz, scale_method = [0, 0, 0, 0, 0]
     index_to_remove = np.random.choice(index_test, 4, replace=False)
 
+    # TODO make index_to_remove integer
+    # index_to_remove = np.random.randint(index_test, 4, replace=False)
     # TODO for the output keep just index_to_remove
 
     # TODO make number (4) of removing samples as parameter?
-    return index_to_remove,
 
-
+    return index_to_remove
 
 
 def confound_isolating_sampling(y, z, n_seed=0, min_sample_size=None,
                                 type_bandwidth='scott'):
     """
-    Sampling method based on the 'Confound izilating cross-calidation'
+    Sampling method based on the 'Confound isolating cross-validation'
     technique.
-    Refere to the paper
+    # TODO Reference to the paper
 
     :param y: numpy.array, shape (n_samples), target
     :param z: numpy.array, shape (n_samples), confound
@@ -113,9 +117,12 @@ def confound_isolating_sampling(y, z, n_seed=0, min_sample_size=None,
         The method used to calculate the estimator bandwidth.  This can be
         'scott', '2scott', '05scott'
     :return:
+        sampled_index,
+        mutual_information
+        correlation
     """
 
-    # TODO do we need 'type _bandwidth'?
+    # TODO do we need 'type _bandwidth' parameter?
 
     ids = list(range(0, y.shape[0]))
 
@@ -130,6 +137,8 @@ def confound_isolating_sampling(y, z, n_seed=0, min_sample_size=None,
     else:
         min_size = np.int(y.shape[0] * min_sample_size / 100)
 
+
+
     while array_data.shape[0] > min_size:
         n_iter = n_iter + 1
         # remove subject from the previous iteration
@@ -142,6 +151,8 @@ def confound_isolating_sampling(y, z, n_seed=0, min_sample_size=None,
 
         # return indexes
         index_to_remove = confound_isolating_index_2remove(y, z, prng=prng)
+        stop
+
 
     # The case when target and confound are equal
     if np.all(y_sampling==z_sampling) == True:
@@ -167,8 +178,8 @@ def random_sampling(y, z, min_sample_size=None, type_bandwidth='scott'):
 
     ids = list(range(0, y.shape[0]))
 
-    mutual_information = []
-    correlation = []
+    # mutual_information = []
+    # correlation = []
     n_iter = 0
     index_to_remove = []
 
@@ -190,13 +201,20 @@ def random_sampling(y, z, min_sample_size=None, type_bandwidth='scott'):
 
     # The case when target and confound are equal
     if np.all(y_sampling == z_sampling) == True:
-        mutual_information.append('NaN')
+        # mutual_information.append('NaN')
+        mutual_information = 'NaN'
     else:
-        mutual_information.append(mutual_kde(y_sampling.astype(float),
-                                  z_sampling.astype(float),
-                                  type_bandwidth=type_bandwidth))
-    correlation.append(np.corrcoef(y_sampling.astype(float),
-                                 z_sampling.astype(float))[0, 1])
+        # mutual_information.append(mutual_kde(y_sampling.astype(float),
+        #                           z_sampling.astype(float),
+        #                           type_bandwidth=type_bandwidth))
+        mutual_information = mutual_kde(y_sampling.astype(float),
+                                             z_sampling.astype(float),
+                                             type_bandwidth=type_bandwidth)
+    # correlation.append(np.corrcoef(y_sampling.astype(float),
+    #                              z_sampling.astype(float))[0, 1])
+
+    correlation = np.corrcoef(y_sampling.astype(float),
+                              z_sampling.astype(float))[0, 1]
 
     # sampled_set = {'sampled_index': array_data[:, 2],
     #                'mutual_information': mi_list,
