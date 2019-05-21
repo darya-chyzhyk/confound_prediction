@@ -87,11 +87,14 @@ def random_index_2remove(y, z):
     :return: numpy.array, shape (m_samples),
         index to be removed, m < n
     """
-
+    n_remove = 4
     y_train, y_test, z_train, z_test, index_train, index_test = \
         train_test_split(y, z, np.arange(y.shape[0]), test_size=0.25,
                          random_state=42)
-    index_to_remove = np.random.choice(index_test, 4, replace=False)
+    if index_test.shape[0] >= n_remove:
+        index_to_remove = np.random.choice(index_test, n_remove, replace=False)
+    else:
+        index_to_remove = np.array([])
 
     # TODO make index_to_remove integer
     # index_to_remove = np.random.randint(index_test, 4, replace=False)
@@ -125,7 +128,7 @@ def confound_isolating_sampling(y, z, n_seed=0, min_sample_size=None,
         correlation
     """
 
-    # TODO do we need 'type _bandwidth' parameter?
+    # TODO do we need 'type_bandwidth' parameter?
 
     sampled_index = list(range(0, y.shape[0]))
 
@@ -187,6 +190,7 @@ def random_sampling(y, z, min_sample_size=None, type_bandwidth='scott'):
     correlation = []
     n_iter = 0
     index_to_remove = []
+    no_index = 0
 
     # array_data = np.c_[y, z, ids]
     if min_sample_size is None:
@@ -194,8 +198,10 @@ def random_sampling(y, z, min_sample_size=None, type_bandwidth='scott'):
     else:
         min_size = np.int(y.shape[0] * min_sample_size / 100)
 
-    while y.shape[0] > min_size:
+    while (y.shape[0] > min_size) and (no_index == 0):
         n_iter = n_iter + 1
+        print(n_iter)
+        print(no_index)
         # remove subject from the previous iteration
 
         # array_data = np.delete(array_data, index_to_remove, axis=0)
@@ -207,6 +213,10 @@ def random_sampling(y, z, min_sample_size=None, type_bandwidth='scott'):
 
         # return indexes
         index_to_remove = random_index_2remove(y, z)
+        print(index_to_remove)
+        if index_to_remove.shape[0] == 0:
+            no_index = 1
+
 
         # The case when target and confound are equal
         if np.all(y == z) == True:
