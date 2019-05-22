@@ -12,7 +12,7 @@ from sklearn.datasets.base import Bunch
 
 from confound_isolating.mutual_information import mutual_kde
 
-
+# TODO
 # sampling_with_kde
 # split to
 # 1) confound isolation
@@ -61,7 +61,7 @@ def confound_isolating_index_2remove(y, z, prng=None):
     ratio_sort = ratio_dens[np.argsort(ratio_dens)]
     empirical_cdf = (np.cumsum(ratio_sort)) ** 5
 
-    # TODO add parameters of number of descarded sunjects, at the moment is
+    # TODO add parameters of number of discarded subjects, at the moment is
     #  a constant = 4
 
     if prng is None:
@@ -134,7 +134,6 @@ def confound_isolating_sampling(y, z, n_seed=0, min_sample_size=None,
 
     mutual_information = []
     correlation = []
-    n_iter = 0
     index_to_remove = []
 
     # array_data = np.c_[y, z, ids]
@@ -145,9 +144,6 @@ def confound_isolating_sampling(y, z, n_seed=0, min_sample_size=None,
         min_size = np.int(y.shape[0] * min_sample_size / 100)
 
     while y.shape[0] > min_size:
-        n_iter = n_iter + 1
-
-        print(n_iter)
 
         # remove subject from the previous iteration
         y = np.delete(y, index_to_remove, axis=0)
@@ -159,9 +155,6 @@ def confound_isolating_sampling(y, z, n_seed=0, min_sample_size=None,
 
         # return indexes
         index_to_remove = confound_isolating_index_2remove(y, z, prng=prng)
-        print(index_to_remove)
-        print(y.shape)
-
 
         # The case when target and confound are equal
         if np.all(y==z) == True:
@@ -183,11 +176,13 @@ def confound_isolating_sampling(y, z, n_seed=0, min_sample_size=None,
 
 def random_sampling(y, z, min_sample_size=None, type_bandwidth='scott'):
     """
-
     :param y: numpy.array, shape (n_samples), target
     :param z: numpy.array, shape (n_samples), confound
     :param min_sample_size: float
-        Minimum sample size to be reached, default is 10% of the data :param type_bandwidth:
+        Minimum sample size to be reached, default is 10% of the data
+    :param type_bandwidth: str, scalar or callable, optional
+        The method used to calculate the estimator bandwidth.  This can be
+        'scott', '2scott', '05scott'
     :return:
     """
 
@@ -203,37 +198,26 @@ def random_sampling(y, z, min_sample_size=None, type_bandwidth='scott'):
         min_size = np.int(y.shape[0] * min_sample_size / 100)
 
     while (y.shape[0] > min_size) and (no_index == 0):
-        # remove subject from the previous iteration
 
-        # array_data = np.delete(array_data, index_to_remove, axis=0)
-        # y_sampling = array_data[:, 0]
-        # z_sampling = array_data[:, 1]
+        # remove subject from the previous iteration
         y = np.delete(y, index_to_remove, axis=0)
         z = np.delete(z, index_to_remove, axis=0)
         sampled_index = np.delete(sampled_index, index_to_remove, axis=0)
 
         # return indexes
         index_to_remove = random_index_2remove(y, z)
-        print(index_to_remove)
         if index_to_remove.shape[0] == 0:
             no_index = 1
 
-
         # The case when target and confound are equal
         if np.all(y == z) == True:
-            # mutual_information.append('NaN')
-            mutual_information = 'NaN'
+            mutual_information.append('NaN')
         else:
             mutual_information.append(mutual_kde(y.astype(float),
                                                  z.astype(float),
                                       type_bandwidth=type_bandwidth))
-            # mutual_information = mutual_kde(y_sampling.astype(float),
-            #                                      z_sampling.astype(float),
-            #                                      type_bandwidth=type_bandwidth)
-        correlation.append(np.corrcoef(y.astype(float), z.astype(float))[0, 1])
 
-        # correlation = np.corrcoef(y_sampling.astype(float),
-        #                           z_sampling.astype(float))[0, 1]
+        correlation.append(np.corrcoef(y.astype(float), z.astype(float))[0, 1])
 
         # sampled_set = {'sampled_index': array_data[:, 2],
         #                'mutual_information': mi_list,
