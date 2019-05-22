@@ -100,7 +100,7 @@ def random_index_2remove(y, z):
     # index_to_remove = np.random.randint(index_test, 4, replace=False)
     # TODO for the output keep just index_to_remove
 
-    # TODO make number (4) of removing samples as parameter?
+    # TODO make number of removing samples (4) as parameter?
 
     return index_to_remove
 
@@ -182,26 +182,27 @@ def confound_isolating_sampling(y, z, n_seed=0, min_sample_size=None,
 
 
 def random_sampling(y, z, min_sample_size=None, type_bandwidth='scott'):
+    """
 
+    :param y: numpy.array, shape (n_samples), target
+    :param z: numpy.array, shape (n_samples), confound
+    :param min_sample_size: float
+        Minimum sample size to be reached, default is 10% of the data :param type_bandwidth:
+    :return:
+    """
 
     sampled_index = list(range(0, y.shape[0]))
-
     mutual_information = []
     correlation = []
-    n_iter = 0
     index_to_remove = []
     no_index = 0
 
-    # array_data = np.c_[y, z, ids]
     if min_sample_size is None:
         min_size = np.int(y.shape[0] / 10)
     else:
         min_size = np.int(y.shape[0] * min_sample_size / 100)
 
     while (y.shape[0] > min_size) and (no_index == 0):
-        n_iter = n_iter + 1
-        print(n_iter)
-        print(no_index)
         # remove subject from the previous iteration
 
         # array_data = np.delete(array_data, index_to_remove, axis=0)
