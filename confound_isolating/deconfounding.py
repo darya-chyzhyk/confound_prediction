@@ -50,7 +50,6 @@ def confound_isolating_cv(X, y, z):
     :return: list of arrays,
         train and test of X, y and sampled indexes
     """
-
     x_test = []
     x_train = []
     y_test = []
@@ -58,10 +57,9 @@ def confound_isolating_cv(X, y, z):
     ids_test = []
     ids_train = []
     ids_sampled = confound_isolating_sampling(y, z, n_seed=0,
-                                            min_sample_size=None,
-                                type_bandwidth='scott')
+                                              min_sample_size=None,
+                                              type_bandwidth='scott')
     ids = list(range(0, y.shape[0]))
-
     for index_list in ids_sampled:
         mask = np.isin(ids, index_list)
         x_test.append(X[mask])
@@ -73,12 +71,9 @@ def confound_isolating_cv(X, y, z):
     return x_test, x_train, y_test, y_train, ids_test, ids_train
 
 
-
-
-
 def deconfound_model_agnostic(signals, confounds):
     """
-    Adapted code from the Nilern code for deconfounding jointly
+    Adapted code from the Nilern.signal.clean code for deconfounding jointly
 
     :param signals: numpy.ndarray
         Timeseries. Must have shape (instant number, features number).
@@ -89,12 +84,13 @@ def deconfound_model_agnostic(signals, confounds):
         If a list is provided, all confounds are removed from the input signal,
         as if all were in the same array.
     :return: numpy.ndarray
-    Input signals, deconfounded. Same shape as signals.
+        Input signals, deconfounded. Same shape as signals.
     """
 
-    # Remove confounds
     # TODO create _ensure_float function
     # confounds = _ensure_float(confounds)
+
+    # Remove confounds
     if not isinstance(confounds, (list, tuple)):
         confounds = (confounds,)
 
@@ -137,13 +133,21 @@ def confound_regressout(X, y, z, type_deconfound, min_sample_size=None,
     """
 
     :param X: array-like, shape (n_samples, n_features)
-    :param y: array-like, shape (n_samples)
-    :param z:
-    :param type_deconfound:
-    :param min_sample_size:
-    :param type_bandwidth:
-    :return:
+    :param y: array-like, shape (n_samples), target
+    :param z: numpy.array, shape (n_samples), confound: list
+    :param type_deconfound: str,
+        The possible options are 'model_agnostic', 'out_of_sample' and
+        'False'. The default is 'out_of_sample'
+    :param min_sample_size: float
+        Minimum sample size to be reached, default is 10% of the data
+    :param type_bandwidth: str, scalar or callable, optional
+        The method used to calculate the estimator bandwidth.  This can be
+        'scott', '2scott', '05scott'
+    :return: list of numpy.ndarray
+        Deconfounded and split 'X' and 'y' to the test and train data with
+        the indexes test.
     """
+    # TODO decide the name of of options for 'type_deconfound'
     # Model-agnostic
     # Out - of - sample
     # Create test and train sets
@@ -164,21 +168,18 @@ def confound_regressout(X, y, z, type_deconfound, min_sample_size=None,
                         type_bandwidth=type_bandwidth)
     ids = list(range(0, y.shape[0]))
 
-    # Train and test sets
     for index_list in ids_sampled:
         mask = np.isin(ids, index_list)
 
-        # test
+        # Creating test and train
         y_test.append(y[mask])
-
-        # train
         y_train.append(y[~mask])
+        ids_test.append(np.array(ids)[mask])
         ids_train.append(np.array(ids)[~mask])
 
         # Deconfound
         if type_deconfound is 'out_of_sample':
 
-            # train test
             deconfounder = DeConfounder()
             deconfounder.fit(X[~mask], z[~mask])
             x_test.append(deconfounder.transform(X[mask], z[mask]))
@@ -188,39 +189,41 @@ def confound_regressout(X, y, z, type_deconfound, min_sample_size=None,
                                                        'False'):
             x_test.append([mask])
             x_train.append(X[~mask])
+    stop
 
     return x_test, x_train, y_test, y_train, ids_test, ids_train
 
 
+############################################################################
 
-    name_base = ('Simulation_exp1_' + type_sampling
-                 + '_regressout_' + str(do_conf_regressout)
-                 + '_permutations_' + str(n_permutations)
-                 + '_seeds_' + str(n_seeds))
-
-    if (n_permutations is None) or (n_permutations == 0):
-        name_csv_prediction = (name_base + '.csv')
-        # prediction y from X, z
-        results = prediction_uni_out_given_datasplit(
-            x_train, x_test, y_train, y_test, ids_train, ids_test,
-            regression_list, results_path, dataset_name, predict_name,
-            atlas, con_measure, sampling_name=type_sampling,
-            confounds_name=confounds_name,
-            do_conf_regressout=do_conf_regressout, n_jobs=n_jobs,
-            to_csv=True,
-            name_csv_prediction=name_csv_prediction)
-
-    else:
-        results = prediction_with_permutation(
-            x_train, x_test, y_train, y_test, ids_train, ids_test,
-            regression_list, results_path, dataset_name,
-            predict_name, atlas, con_measure,
-            sampling_name=type_sampling, confounds_name=confounds_name,
-            do_conf_regressout=do_conf_regressout, n_jobs=n_jobs,
-            to_csv=True, n_permutations=n_permutations, name_base=name_base)
-
-    # save sampled info
-    save_timeseries_to_pkl(sampled_set, results_path,
-                           name_file=name_base,
-                           suffix='_sampled',
-                           extension=None)
+    # name_base = ('Simulation_exp1_' + type_sampling
+    #              + '_regressout_' + str(do_conf_regressout)
+    #              + '_permutations_' + str(n_permutations)
+    #              + '_seeds_' + str(n_seeds))
+    #
+    # if (n_permutations is None) or (n_permutations == 0):
+    #     name_csv_prediction = (name_base + '.csv')
+    #     # prediction y from X, z
+    #     results = prediction_uni_out_given_datasplit(
+    #         x_train, x_test, y_train, y_test, ids_train, ids_test,
+    #         regression_list, results_path, dataset_name, predict_name,
+    #         atlas, con_measure, sampling_name=type_sampling,
+    #         confounds_name=confounds_name,
+    #         do_conf_regressout=do_conf_regressout, n_jobs=n_jobs,
+    #         to_csv=True,
+    #         name_csv_prediction=name_csv_prediction)
+    #
+    # else:
+    #     results = prediction_with_permutation(
+    #         x_train, x_test, y_train, y_test, ids_train, ids_test,
+    #         regression_list, results_path, dataset_name,
+    #         predict_name, atlas, con_measure,
+    #         sampling_name=type_sampling, confounds_name=confounds_name,
+    #         do_conf_regressout=do_conf_regressout, n_jobs=n_jobs,
+    #         to_csv=True, n_permutations=n_permutations, name_base=name_base)
+    #
+    # # save sampled info
+    # save_timeseries_to_pkl(sampled_set, results_path,
+    #                        name_file=name_base,
+    #                        suffix='_sampled',
+    #                        extension=None)
