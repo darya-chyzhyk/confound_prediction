@@ -129,7 +129,7 @@ def deconfound_model_agnostic(signals, confounds):
 
 
 def confound_regressout(X, y, z, type_deconfound, min_sample_size=None,
-                        type_bandwidth='scott'):
+                        cv_folds = 10, type_bandwidth='scott'):
     """
 
     :param X: array-like, shape (n_samples, n_features)
@@ -157,18 +157,22 @@ def confound_regressout(X, y, z, type_deconfound, min_sample_size=None,
     y_train = []
     ids_test = []
     ids_train = []
+    ids_sampled = []
 
     # Pre-confounding
     if type_deconfound == 'model_agnostic':
         X = deconfound_model_agnostic(X, z)
 
     # Sampling
-    ids_sampled, mutual_information, correlation = \
-        random_sampling(y, z, min_sample_size=min_sample_size,
-                        type_bandwidth=type_bandwidth)
-    ids = list(range(0, y.shape[0]))
+    for cv_fold in range(cv_folds):
+        ids_sampled_fold, _, _ = random_sampling(y, z,
+                                                 min_sample_size=min_sample_size,
+                                                 type_bandwidth=type_bandwidth)
+        ids_sampled.append(ids_sampled_fold)
 
     for index_list in ids_sampled:
+
+        ids = list(range(0, y.shape[0]))
         mask = np.isin(ids, index_list)
 
         # Creating test and train
@@ -189,7 +193,6 @@ def confound_regressout(X, y, z, type_deconfound, min_sample_size=None,
                                                        'False'):
             x_test.append([mask])
             x_train.append(X[~mask])
-    stop
 
     return x_test, x_train, y_test, y_train, ids_test, ids_train
 
