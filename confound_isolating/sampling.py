@@ -190,7 +190,9 @@ def random_sampling(y, z, min_sample_size=None, type_bandwidth='scott'):
     mutual_information = []
     correlation = []
     index_to_remove = []
-    no_index = 0
+    no_index = 0 # rin case of the size of test set inside of the
+    # 'random_index_2remove' is smaller then 'min_sample_size', no_index
+    # becomes 1 and stop the sampling
 
     if min_sample_size is None:
         min_size = np.int(y.shape[0] / 10)
