@@ -98,7 +98,7 @@ def mutual_information(variables, k=1):
             - _entropy(all_vars, k=k))
 
 
-def mutual_kde(x, y, type_bandwidth='scott'):
+def mutual_kde(x, y):
     """Mutual information estimated as cumulative sum  of ratio
      P(x)P(y)/P(x,y)
      The probability density functions we estimate with kernel-dencity
@@ -106,9 +106,6 @@ def mutual_kde(x, y, type_bandwidth='scott'):
 
     :param x: numpy.array, shape (n_samples)
     :param y: numpy.array, shape (n_samples)
-    :param type_bandwidth: str, scalar or callable, optional
-        The method used to calculate the estimator bandwidth.  This can be
-        'scott', '2scott', '05scott'
     :return: float
         Mutual information, a non-negative value
 
@@ -116,7 +113,7 @@ def mutual_kde(x, y, type_bandwidth='scott'):
     Bandwidth make influence on the KDE estimation. We use Scott's rule,
     'scott', that is default parameter in 'gaussian_kde'
     """
-    # TODO clarify if we need 'type_bandwidth'
+    type_bandwidth = 'scott'
 
     xmin = x.min() - 0.1 * (x.max() - x.min())
     xmax = x.max() + 0.1 * (x.max() - x.min())
@@ -144,41 +141,6 @@ def mutual_kde(x, y, type_bandwidth='scott'):
 
     kde_y.set_bandwidth(bw_method=bandwidth)
     kde_y.set_bandwidth(bw_method=kde_y.factor * coef_bandwidth)
-
-
-    # if type_bandwidth != 'scott':
-    #     dict_bandwidth = {'2scott': 2.0, '05scott': 0.5}
-    #     coef_bandwidth = dict_bandwidth[type_bandwidth]
-    #
-    #     kde_xy.set_bandwidth(bw_method=bandwidth)
-    #     kde_xy.set_bandwidth(bw_method=kde_xy.factor * coef_bandwidth)
-    #
-    #     kde_x.set_bandwidth(bw_method=bandwidth)
-    #     kde_x.set_bandwidth(bw_method=kde_x.factor * coef_bandwidth)
-    #
-    #     kde_y.set_bandwidth(bw_method=bandwidth)
-    #     kde_y.set_bandwidth(bw_method=kde_y.factor * coef_bandwidth)
-
-
-    # if type_bandwidth == '2scott':
-    #     kde_xy.set_bandwidth(bw_method=bandwidth)
-    #     kde_xy.set_bandwidth(bw_method=kde_xy.factor * 2.0)
-    #
-    #     kde_x.set_bandwidth(bw_method=bandwidth)
-    #     kde_x.set_bandwidth(bw_method=kde_x.factor * 2.0)
-    #
-    #     kde_y.set_bandwidth(bw_method=bandwidth)
-    #     kde_y.set_bandwidth(bw_method=kde_y.factor * 2.0)
-    #
-    # if type_bandwidth == '05scott':
-    #     kde_xy.set_bandwidth(bw_method=bandwidth)
-    #     kde_xy.set_bandwidth(bw_method=kde_xy.factor * 0.5)
-    #
-    #     kde_x.set_bandwidth(bw_method=bandwidth)
-    #     kde_x.set_bandwidth(bw_method=kde_x.factor * 0.5)
-    #
-    #     kde_y.set_bandwidth(bw_method=bandwidth)
-    #     kde_y.set_bandwidth(bw_method=kde_y.factor * 0.5)
 
     # Mutual information
     kde_xy_values = kde_xy(XYm.T)
