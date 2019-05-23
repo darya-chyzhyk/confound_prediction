@@ -105,8 +105,7 @@ def random_index_2remove(y, z):
     return index_to_remove
 
 
-def confound_isolating_sampling(y, z, random_seed=0, min_sample_size=None,
-                                type_bandwidth='scott'):
+def confound_isolating_sampling(y, z, random_seed=0, min_sample_size=None):
     """
     Sampling method based on the 'Confound isolating cross-validation'
     technique.
@@ -119,19 +118,13 @@ def confound_isolating_sampling(y, z, random_seed=0, min_sample_size=None,
         Can be any integer between 0 and 2**32 - 1 inclusive. Defaul is '0'
     :param min_sample_size: float
         Minimum sample size to be reached, default is 10% of the data
-    :param type_bandwidth: str, scalar or callable, optional
-        The method used to calculate the estimator bandwidth.  This can be
-        'scott', '2scott', '05scott'
     :return:
         sampled_index,
         mutual_information
         correlation
     """
 
-    # TODO do we need 'type_bandwidth' parameter?
-
     sampled_index = list(range(0, y.shape[0]))
-
     mutual_information = []
     correlation = []
     index_to_remove = []
@@ -161,8 +154,7 @@ def confound_isolating_sampling(y, z, random_seed=0, min_sample_size=None,
             mutual_information.append('NaN')
         else:
             mutual_information.append(mutual_kde(y.astype(float),
-                                                 z.astype(float),
-                                      type_bandwidth=type_bandwidth))
+                                                 z.astype(float)))
         correlation.append(np.corrcoef(y.astype(float), z.astype(float))[0, 1])
 
     # sampled_set = {'sampled_index': array_data[:, 2],
@@ -173,16 +165,12 @@ def confound_isolating_sampling(y, z, random_seed=0, min_sample_size=None,
     return sampled_index, mutual_information, correlation
 
 
-
-def random_sampling(y, z, min_sample_size=None, type_bandwidth='scott'):
+def random_sampling(y, z, min_sample_size=None):
     """
     :param y: numpy.array, shape (n_samples), target
     :param z: numpy.array, shape (n_samples), confound
     :param min_sample_size: float
         Minimum sample size to be reached, default is 10% of the data
-    :param type_bandwidth: str, scalar or callable, optional
-        The method used to calculate the estimator bandwidth.  This can be
-        'scott', '2scott', '05scott'
     :return:
     """
 
@@ -216,8 +204,7 @@ def random_sampling(y, z, min_sample_size=None, type_bandwidth='scott'):
             mutual_information.append('NaN')
         else:
             mutual_information.append(mutual_kde(y.astype(float),
-                                                 z.astype(float),
-                                      type_bandwidth=type_bandwidth))
+                                                 z.astype(float)))
 
         correlation.append(np.corrcoef(y.astype(float), z.astype(float))[0, 1])
 
