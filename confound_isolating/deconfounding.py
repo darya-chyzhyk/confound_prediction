@@ -39,7 +39,7 @@ class DeConfounder(BaseEstimator, TransformerMixin):
 
 
 def confound_isolating_cv(X, y, z, random_seed=0, min_sample_size=None,
-                          cv_folds=10, type_bandwidth='scott'):
+                          cv_folds=10):
     """
     Function that create the test and training sets, masking the samples with
     indexes obtained from the Confound Isolation sampling
@@ -61,8 +61,7 @@ def confound_isolating_cv(X, y, z, random_seed=0, min_sample_size=None,
     # Sampling
     for cv_fold in range(cv_folds):
         ids_sampled_fold, _, _ = confound_isolating_sampling(y, z, random_seed=random_seed,
-                                              min_sample_size=min_sample_size,
-                                              type_bandwidth=type_bandwidth)
+                                              min_sample_size=min_sample_size)
         ids_sampled.append(ids_sampled_fold)
 
     for index_list in ids_sampled:
@@ -135,7 +134,7 @@ def deconfound_model_agnostic(signals, confounds):
 
 
 def confound_regressout(X, y, z, type_deconfound, min_sample_size=None,
-                        cv_folds=10, type_bandwidth='scott'):
+                        cv_folds=10):
     """
 
     :param X: array-like, shape (n_samples, n_features)
@@ -148,9 +147,6 @@ def confound_regressout(X, y, z, type_deconfound, min_sample_size=None,
         Minimum sample size to be reached, default is 10% of the data
     :param cv_folds: int
         number of folders to mimic the cross validation
-    :param type_bandwidth: str, scalar or callable, optional
-        The method used to calculate the estimator bandwidth.  This can be
-        'scott', '2scott', '05scott'
     :return: list of numpy.ndarray
         Deconfounded and split 'X' and 'y' to the test and train data with
         the indexes test.
@@ -174,8 +170,7 @@ def confound_regressout(X, y, z, type_deconfound, min_sample_size=None,
     # Sampling
     for cv_fold in range(cv_folds):
         ids_sampled_fold, _, _ = random_sampling(y, z,
-                                                 min_sample_size=min_sample_size,
-                                                 type_bandwidth=type_bandwidth)
+                                                 min_sample_size=min_sample_size)
         ids_sampled.append(ids_sampled_fold)
 
     for index_list in ids_sampled:
