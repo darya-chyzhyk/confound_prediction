@@ -19,12 +19,14 @@ from confound_isolating.mutual_information import mutual_kde
 # 2) randome
 
 
-def confound_isolating_index_2remove(y, z, prng=None):
+def confound_isolating_index_2remove(y, z, n_remove=4, prng=None):
     """
     The goal is to find a test set with independence between y and z
 
     :param y: numpy.array, shape (n_samples), target
     :param z: numpy.array, shape (n_samples), confound
+    :param n_remove: int,
+        number to be removed in each iteration, the default is 4
     :param prng: np.random.RandomState, default is None
         control the pseudo random number generator
     :return: numpy.array, shape (m_samples),
@@ -65,9 +67,9 @@ def confound_isolating_index_2remove(y, z, prng=None):
     #  a constant = 4
 
     if prng is None:
-        random_quantiles = np.random.random(size=4) * empirical_cdf.max()
+        random_quantiles = np.random.random(size=n_remove) * empirical_cdf.max()
     else:
-        random_quantiles = prng.rand(4) * empirical_cdf.max()
+        random_quantiles = prng.rand(n_remove) * empirical_cdf.max()
     idx_to_reject = np.searchsorted(empirical_cdf, random_quantiles,
                                     side='left')
     # Index from test subset to be removed
@@ -79,15 +81,16 @@ def confound_isolating_index_2remove(y, z, prng=None):
     return index_to_remove
 
 
-def random_index_2remove(y, z):
+def random_index_2remove(y, z, n_remove=4):
     """
     Function to select 4 random indexes to remove
     :param y: numpy.array, shape (n_samples), target
     :param z: numpy.array, shape (n_samples), confound
+    :param n_remove: int,
+        number to be removed in each iteration, the default is 4
     :return: numpy.array, shape (m_samples),
         index to be removed, m < n
     """
-    n_remove = 4
     y_train, y_test, z_train, z_test, index_train, index_test = \
         train_test_split(y, z, np.arange(y.shape[0]), test_size=0.25,
                          random_state=42)
