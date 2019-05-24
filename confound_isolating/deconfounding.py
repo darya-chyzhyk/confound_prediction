@@ -134,7 +134,7 @@ def deconfound_model_agnostic(signals, confounds):
 
 
 def confound_regressout(X, y, z, type_deconfound, min_sample_size=None,
-                        cv_folds=10):
+                        cv_folds=10, n_remove=None):
     """
 
     :param X: array-like, shape (n_samples, n_features)
@@ -170,7 +170,8 @@ def confound_regressout(X, y, z, type_deconfound, min_sample_size=None,
     # Sampling
     for cv_fold in range(cv_folds):
         ids_sampled_fold, _, _ = random_sampling(y, z,
-                                                 min_sample_size=min_sample_size)
+                                                 min_sample_size=min_sample_size,
+                                                 n_remove=n_remove)
         ids_sampled.append(ids_sampled_fold)
 
     for index_list in ids_sampled:
