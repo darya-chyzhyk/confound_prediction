@@ -108,7 +108,8 @@ def random_index_2remove(y, z, n_remove=4):
     return index_to_remove
 
 
-def confound_isolating_sampling(y, z, random_seed=0, min_sample_size=None):
+def confound_isolating_sampling(y, z, random_seed=0, min_sample_size=None,
+                                n_remove=4):
     """
     Sampling method based on the 'Confound isolating cross-validation'
     technique.
@@ -150,7 +151,9 @@ def confound_isolating_sampling(y, z, random_seed=0, min_sample_size=None):
         prng = np.random.RandomState(seed=random_seed)
 
         # return indexes
-        index_to_remove = confound_isolating_index_2remove(y, z, prng=prng)
+        index_to_remove = confound_isolating_index_2remove(y, z,
+                                                           n_remove=n_remove,
+                                                           prng=prng)
 
         # The case when target and confound are equal
         if np.all(y==z) == True:
@@ -168,7 +171,7 @@ def confound_isolating_sampling(y, z, random_seed=0, min_sample_size=None):
     return sampled_index, mutual_information, correlation
 
 
-def random_sampling(y, z, min_sample_size=None):
+def random_sampling(y, z, n_remove=4, min_sample_size=None):
     """
     :param y: numpy.array, shape (n_samples), target
     :param z: numpy.array, shape (n_samples), confound
