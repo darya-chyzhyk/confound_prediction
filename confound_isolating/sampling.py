@@ -171,10 +171,13 @@ def confound_isolating_sampling(y, z, random_seed=0, min_sample_size=None,
     return sampled_index, mutual_information, correlation
 
 
-def random_sampling(y, z, n_remove=4, min_sample_size=None):
+def random_sampling(y, z, min_sample_size=None, n_remove=None):
     """
     :param y: numpy.array, shape (n_samples), target
     :param z: numpy.array, shape (n_samples), confound
+    :param n_remove: int,
+        number of the samples to be removee on each itteration of sampling,
+        default is 4
     :param min_sample_size: float
         Minimum sample size to be reached, default is 10% of the data
     :return:
@@ -193,6 +196,16 @@ def random_sampling(y, z, n_remove=4, min_sample_size=None):
     else:
         min_size = np.int(y.shape[0] * min_sample_size / 100)
 
+    if isinstance(n_remove, (list, tuple, str, np.ndarray)) or n_remove < 0:
+        raise TypeError("n_remove keyword has an unhandled type: %s"
+                        % n_remove.__class__ +  " or it is not positive")
+
+
+    if n_remove is None:
+        n_remove = 4
+    if isinstance(n_remove, float):
+        n_remove = int(n_remove)
+
     while (y.shape[0] > min_size) and (no_index == 0):
 
         # remove subject from the previous iteration
@@ -201,7 +214,7 @@ def random_sampling(y, z, n_remove=4, min_sample_size=None):
         sampled_index = np.delete(sampled_index, index_to_remove, axis=0)
 
         # return indexes
-        index_to_remove = random_index_2remove(y, z)
+        index_to_remove = random_index_2remove(y, z, n_remove=n_remove)
         if index_to_remove.shape[0] == 0:
             no_index = 1
 
