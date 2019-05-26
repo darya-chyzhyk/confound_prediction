@@ -15,16 +15,17 @@ from confound_isolating.deconfounding import (confound_isolating_cv,
 X, y, z, = simulate_confounded_data(link_type='direct_link', n_samples=100,
                           n_features=2)
 
-x_test, x_train, y_test, y_train, ids_test, ids_train = \
-    confound_isolating_cv(X, y, z, random_seed=0, min_sample_size=None,
-                          cv_folds=10, type_bandwidth='scott')
+# x_test, x_train, y_test, y_train, ids_test, ids_train = \
+#     confound_isolating_cv(X, y, z, random_seed=0, min_sample_size=None,
+#                           cv_folds=10, type_bandwidth='scott')
 
 
 
 x_test, x_train, y_test, y_train, ids_test, ids_train = \
     confound_regressout(X, y, z, type_deconfound='out_of_sample',
                         min_sample_size=None,
-                        type_bandwidth='scott')
+                        cv_folds=10, n_remove=10)
+
 
 
 
