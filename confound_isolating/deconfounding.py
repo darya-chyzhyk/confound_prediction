@@ -39,7 +39,7 @@ class DeConfounder(BaseEstimator, TransformerMixin):
 
 
 def confound_isolating_cv(X, y, z, random_seed=0, min_sample_size=None,
-                          cv_folds=10):
+                          cv_folds=10, n_remove=None):
     """
     Function that create the test and training sets, masking the samples with
     indexes obtained from the Confound Isolation sampling
@@ -47,6 +47,9 @@ def confound_isolating_cv(X, y, z, random_seed=0, min_sample_size=None,
     :param X: array-like, shape (n_samples, n_features)
     :param y: array-like, shape (n_samples), target
     :param z: numpy.array, shape (n_samples), confound: list
+    :param n_remove: int,
+        number of the samples to be removee on each itteration of sampling,
+        default is 4
     :return: list of arrays,
         train and test of X, y and sampled indexes
     """
@@ -147,6 +150,9 @@ def confound_regressout(X, y, z, type_deconfound, min_sample_size=None,
         Minimum sample size to be reached, default is 10% of the data
     :param cv_folds: int
         number of folders to mimic the cross validation
+    :param n_remove: int,
+        number of the samples to be removee on each itteration of sampling,
+        default is 4
     :return: list of numpy.ndarray
         Deconfounded and split 'X' and 'y' to the test and train data with
         the indexes test.
