@@ -63,8 +63,10 @@ def confound_isolating_cv(X, y, z, random_seed=0, min_sample_size=None,
 
     # Sampling
     for cv_fold in range(cv_folds):
-        ids_sampled_fold, _, _ = confound_isolating_sampling(y, z, random_seed=random_seed,
-                                              min_sample_size=min_sample_size)
+        ids_sampled_fold, _, _ = \
+            confound_isolating_sampling(y, z, random_seed=random_seed,
+                                        min_sample_size=min_sample_size,
+                                        n_remove = n_remove)
         ids_sampled.append(ids_sampled_fold)
 
     for index_list in ids_sampled:
