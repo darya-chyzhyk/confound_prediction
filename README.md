@@ -19,7 +19,7 @@ Developed framework is based on anti mutual information sampling, a novel sampli
 ### How does it work?
 
 <p align="center">
-  <img src="https://github.com/darya-chyzhyk/confound_isolating_cv/blob/master/docs/evolutionc.svg" height="300">
+  <img src="https://github.com/darya-chyzhyk/confound_isolating_cv/blob/master/docs/Confound_isolation_cv_evolution.svg" height="150">
 </p>
 
 **You provide us**
@@ -44,9 +44,9 @@ Variables:
 ## Another methods.
 We also provide 2 state of the art in neuroscience deconfounding techniques:
 
-&nbsp; **1. Out-of-sample deconfounding**
+&nbsp; 1. Out-of-sample deconfounding
 
-&nbsp; **2. Deconfounding test and train jointly**
+&nbsp; 2. Deconfounding test and train jointly
 
 
 
