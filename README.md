@@ -9,7 +9,10 @@ We introduce a non-parametric approach, named **“confound-isolating cross-vali
 
 ### What expect from Confound_prediction?
 
-Developed framework is based on anti mutual information sampling, a novel sampling approach to create a test set in which the effect of interest is independent from the confounding effect.
+Developed framework is based on anti mutual information sampling, a novel sampling approach to create a test set in which the effect of interest is independent from the confounding effect. The grafical illustration of classic and confound-isolating cross-validation:
+
+![](https://github.com/darya-chyzhyk/confound_isolating_cv/blob/master/docs/Cross_validation.pdf)
+
 
 ### How does it work?
 
