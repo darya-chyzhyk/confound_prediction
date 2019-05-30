@@ -123,7 +123,7 @@ def confound_isolating_sampling(y, z, random_seed=0, min_sample_size=None,
     :param min_sample_size: float
         Minimum sample size to be reached, default is 10% of the data
     :param n_remove: int,
-        number of the samples to be removee on each itteration of sampling,
+        number of the samples to be removed on each iteration of sampling,
         default is 4
     :return:
         sampled_index,
