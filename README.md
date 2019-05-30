@@ -1,4 +1,4 @@
-# Confound Isolating cross-validation
+# Confound Isolating Cross-Validation
 
 ## Confound_prediction is a Python module to control confound effect in the prediction or classification model.
 
@@ -11,18 +11,24 @@ We introduce a non-parametric approach, named **“confound-isolating cross-vali
 
 Developed framework is based on anti mutual information sampling, a novel sampling approach to create a test set in which the effect of interest is independent from the confounding effect. The grafical illustration of classic and confound-isolating cross-validation:
 
-![](https://github.com/darya-chyzhyk/confound_isolating_cv/blob/master/docs/Cross_validation.pdf)
+<p align="center">
+  <img src="https://github.com/darya-chyzhyk/confound_isolating_cv/blob/master/docs/Cross_validation_classic.svg" height="300"> <img src="https://github.com/darya-chyzhyk/confound_isolating_cv/blob/master/docs/Cross_validation_confound_isolation.svg" height="300"> 
+</p>
 
 
 ### How does it work?
+
+<p align="center">
+  <img src="https://github.com/darya-chyzhyk/confound_isolating_cv/blob/master/docs/evolutionc.svg" height="300">
+</p>
 
 **You provide us**
 
 Variables:
 &nbsp;
-* X - data with shape (n_samples, n_features)
-* y - target vector with shape (n_samples)
-* z - confound vector with shape (n_samples)
+* *X* - data with shape (n_samples, n_features)
+* *y* - target vector with shape (n_samples)
+* *z* - confound vector with shape (n_samples)
 
 Optional parameters
 * *min_sample_size* - minimum sample size to be reached, default is 10% of the data
@@ -33,14 +39,14 @@ Optional parameters
 **We return you**
 
 Variables:
-* x_test, x_train, y_test, y_train, ids_test, ids_train - train and test of X, y and sampled indexes
+* *x_test, x_train, y_test, y_train, ids_test, ids_train* - train and test of *X*, *y* and *sampled indexes*
 
 ## Another methods.
 We also provide 2 state of the art in neuroscience deconfounding techniques:
 
 &nbsp; **1. Out-of-sample deconfounding**
 
-&nbsp; **2. Deconfounding test and train jointl**
+&nbsp; **2. Deconfounding test and train jointly**
 
 
 
