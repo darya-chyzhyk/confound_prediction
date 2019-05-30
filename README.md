@@ -1,4 +1,4 @@
-# Confound Isolating Cross-Validation
+# Confound Prediction
 
 ## Confound_prediction is a Python module to control confound effect in the prediction or classification model.
 
@@ -41,13 +41,12 @@ Optional parameters
 Variables:
 * *x_test, x_train, y_test, y_train, ids_test, ids_train* - train and test of *X*, *y* and *sampled indexes*
 
-## Another methods.
+## Another methods
 We also provide 2 state of the art in neuroscience deconfounding techniques:
 
 &nbsp; 1. Out-of-sample deconfounding
 
 &nbsp; 2. Deconfounding test and train jointly
-
 
 
 ## References
