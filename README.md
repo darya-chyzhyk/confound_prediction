@@ -34,13 +34,17 @@ Variables:
 
 ## Another methods.
 We also provide 2 state of the art in neuroscience deconfounding techniques:
+
 &nbsp; **1. Out-of-sample deconfounding**
+
 &nbsp; **2. Deconfounding test and train jointl**
 
 
 
 ## References
+
 [1] TBD
+
 [2] D. Chyzhyk, G. Varoquaux, B. Thirion and M. Milham, "Controlling a confound in predictive models with a test set minimizing its effect," 2018 International Workshop on Pattern Recognition in Neuroimaging (PRNI), Singapore, 2018, pp. 1-4.
 doi: 10.1109/PRNI.2018.8423961 [PDF](https://hal.archives-ouvertes.fr/hal-01831701/document)
 
