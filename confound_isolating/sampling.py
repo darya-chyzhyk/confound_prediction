@@ -142,12 +142,13 @@ def confound_isolating_sampling(y, z, random_seed=0, min_sample_size=None,
     correlation = []
     index_to_remove = []
 
+    if n_remove is None:
+        n_remove = 4
+
     if isinstance(n_remove, (list, tuple, str, np.ndarray)) or n_remove < 0:
         raise TypeError("n_remove keyword has an unhandled type: %s"
                         % n_remove.__class__ + " or it is not positive")
 
-    if n_remove is None:
-        n_remove = 4
 
     if isinstance(n_remove, float):
         n_remove = int(n_remove)
