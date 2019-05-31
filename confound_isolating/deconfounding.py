@@ -1,5 +1,5 @@
 '''Deconfounding
-1. Confound izolation cross validation
+1. Confound isolation cross validation
 2. Confound regress-out
     a. jointly
     b. out-of-sample
