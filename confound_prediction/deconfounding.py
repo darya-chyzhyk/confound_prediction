@@ -11,7 +11,7 @@ from sklearn.linear_model import LinearRegression
 
 from scipy import linalg
 
-from confound_isolating.sampling import (random_sampling,
+from confound_prediction.sampling import (random_sampling,
                                          confound_isolating_sampling)
 
 class DeConfounder(BaseEstimator, TransformerMixin):

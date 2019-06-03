@@ -1,12 +1,12 @@
 
 
-from confound_isolating.data_simulation import simulate_confounded_data
-from confound_isolating.sampling import (random_index_2remove,
+from confound_prediction.data_simulation import simulate_confounded_data
+from confound_prediction.sampling import (random_index_2remove,
                                          confound_isolating_index_2remove,
                                          confound_isolating_sampling,
                                          random_sampling)
 
-from confound_isolating.deconfounding import (confound_isolating_cv,
+from confound_prediction.deconfounding import (confound_isolating_cv,
                                               confound_regressout)
 
 

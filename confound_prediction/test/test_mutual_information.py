@@ -1,6 +1,6 @@
 import numpy as np
 
-from confound_isolating.mutual_information import (_entropy,
+from confound_prediction.mutual_information import (_entropy,
                                                    _entropy_gaussian,
                                                    mutual_information,
                                                    mutual_kde)

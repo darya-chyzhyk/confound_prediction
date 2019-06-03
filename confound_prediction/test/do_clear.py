@@ -1,7 +1,7 @@
 from nilearn.signal import clean
 
-from confound_isolating.deconfounding import deconfound_jointly
-from confound_isolating.data_simulation import simulate_confounded_data
+from confound_prediction.deconfounding import deconfound_jointly
+from confound_prediction.data_simulation import simulate_confounded_data
 
 
 X, y, z, = simulate_confounded_data(link_type='direct_link', n_samples=100,

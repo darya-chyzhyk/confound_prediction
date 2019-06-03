@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 from sklearn import preprocessing
 from sklearn.datasets.base import Bunch
 
-from confound_isolating.mutual_information import mutual_kde
+from confound_prediction.mutual_information import mutual_kde
 
 # TODO
 # sampling_with_kde

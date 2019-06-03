@@ -1,6 +1,6 @@
 
 import numpy as np
-from confound_isolating.deconfounding import DeConfounder
+from confound_prediction.deconfounding import DeConfounder
 
 def test_deconfounder():
     rng = np.random.RandomState(0)

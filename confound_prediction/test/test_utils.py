@@ -1,4 +1,4 @@
-from confound_isolating.utils import _ensure_int_positive
+from confound_prediction.utils import _ensure_int_positive
 from nose.tools import assert_raises
 
 

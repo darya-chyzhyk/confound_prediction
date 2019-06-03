@@ -1,6 +1,6 @@
 
 
-from confound_isolating.data_simulation import simulate_confounded_data
+from confound_prediction.data_simulation import simulate_confounded_data
 
 # Simulate data
 X, y, z, = simulate_confounded_data(link_type='direct_link', n_samples=100,
