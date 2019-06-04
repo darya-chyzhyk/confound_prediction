@@ -1,6 +1,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from joblib import Parallel, delayed
 
 from confound_prediction.data_simulation import simulate_confounded_data
 from confound_prediction.sampling import (random_index_2remove,
@@ -44,6 +45,25 @@ for cv_fold in range(cv_folds):
 
 
 
+# TODO joblib option
+#
+# rs_cv = Parallel(n_jobs=5, verbose=1)(
+#                 delayed(random_sampling)(y, z, min_sample_size=None,
+#                                          n_remove=None)
+#                 for cv_fold in range(cv_folds))
+#
+# ci_cv = Parallel(n_jobs=5, verbose=1)(
+#                 delayed(confound_isolating_sampling)(y, z, random_seed=None,
+#                                                      min_sample_size=None,
+#                                                      n_remove=None)
+#                 for cv_fold in range(cv_folds))
+# for cv_fold in range(cv_folds):
+#     ids_rs.append(rs_cv[]), mi_rs_cv, corr_rs_cv
+# ids_rs, mi_ci_cv, corr_ci_cv
+
+
+
+
 mi_rs_cv = np.array(mi_rs_cv)
 corr_rs_cv = np.array(corr_rs_cv)
 mi_ci_cv = np.array(mi_ci_cv)
@@ -74,9 +94,3 @@ ax1.set_title('Correlation, random sampling')
 ax2.set_title('Correlation, Confound isoaltion')
 
 
-#
-# sampled_list = Parallel(n_jobs=n_jobs, verbose=1)(
-#                 delayed(sampling)(x_sampling, y_sampling, ids,
-#                                   type_sampling=type_sampling, n_seed=n_seed,
-#                                   min_size=min_size, save_mi_iter=save_mi_iter)
-#                 for n_seed in range(n_seeds))
