@@ -114,7 +114,7 @@ def random_index_2remove(y, z, n_remove=None):
     return index_to_remove
 
 
-def confound_isolating_sampling(y, z, random_seed=0, min_sample_size=None,
+def confound_isolating_sampling(y, z, random_seed=None, min_sample_size=None,
                                 n_remove=None):
     """
     Sampling method based on the 'Confound isolating cross-validation'
@@ -125,7 +125,7 @@ def confound_isolating_sampling(y, z, random_seed=0, min_sample_size=None,
     :param z: numpy.array, shape (n_samples), confound
     :param random_seed: int
         Random seed used to initialize the pseudo-random number generator.
-        Can be any integer between 0 and 2**32 - 1 inclusive. Defaul is '0'
+        Can be any integer between 0 and 2**32 - 1 inclusive. Defaul is None
     :param min_sample_size: int
         Minimum sample size (in samples) to be reached, default is 10% of the
         data
@@ -156,7 +156,10 @@ def confound_isolating_sampling(y, z, random_seed=0, min_sample_size=None,
         sampled_index = np.delete(sampled_index, index_to_remove, axis=0)
 
         # control the pseudo random number generator
-        prng = np.random.RandomState(seed=random_seed)
+        if random_seed is None:
+            prng = None
+        else:
+            prng = np.random.RandomState(seed=random_seed)
 
         # return indexes
         index_to_remove = confound_isolating_index_2remove(y, z,
