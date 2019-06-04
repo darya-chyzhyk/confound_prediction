@@ -11,6 +11,7 @@ from sklearn import preprocessing
 from sklearn.datasets.base import Bunch
 
 from confound_prediction.mutual_information import mutual_kde
+from confound_prediction.utils import _ensure_int_positive
 
 # TODO
 # sampling_with_kde
@@ -33,8 +34,8 @@ def confound_isolating_index_2remove(y, z, n_remove=None, prng=None):
         index to be removed, m < n
     """
 
-    if n_remove is None:
-        n_remove = 4
+    n_remove = _ensure_int_positive(n_remove, default=4)
+
     y_train, y_test, z_train, z_test, index_train, index_test = \
         train_test_split(y, z, np.arange(y.shape[0]), test_size=0.25,
                          random_state=42)
@@ -93,8 +94,7 @@ def random_index_2remove(y, z, n_remove=None):
     :return: numpy.array, shape (m_samples),
         index to be removed, m < n
     """
-    if n_remove is None:
-        n_remove = 4
+    n_remove = _ensure_int_positive(n_remove, default=4)
 
     y_train, y_test, z_train, z_test, index_train, index_test = \
         train_test_split(y, z, np.arange(y.shape[0]), test_size=0.25,
@@ -126,8 +126,9 @@ def confound_isolating_sampling(y, z, random_seed=0, min_sample_size=None,
     :param random_seed: int
         Random seed used to initialize the pseudo-random number generator.
         Can be any integer between 0 and 2**32 - 1 inclusive. Defaul is '0'
-    :param min_sample_size: float
-        Minimum sample size to be reached, default is 10% of the data
+    :param min_sample_size: int
+        Minimum sample size (in samples) to be reached, default is 10% of the
+        data
     :param n_remove: int,
         number of the samples to be removed on each iteration of sampling,
         default is 4
@@ -142,21 +143,10 @@ def confound_isolating_sampling(y, z, random_seed=0, min_sample_size=None,
     correlation = []
     index_to_remove = []
 
-    if n_remove is None:
-        n_remove = 4
+    n_remove = _ensure_int_positive(n_remove, default=4)
 
-    if isinstance(n_remove, (list, tuple, str, np.ndarray)) or n_remove < 0:
-        raise TypeError("n_remove keyword has an unhandled type: %s"
-                        % n_remove.__class__ + " or it is not positive")
-
-
-    if isinstance(n_remove, float):
-        n_remove = int(n_remove)
-
-    if min_sample_size is None:
-        min_size = np.int(y.shape[0] / 10)
-    else:
-        min_size = np.int(y.shape[0] * min_sample_size / 100)
+    min_sample_size = _ensure_int_positive(min_sample_size, default=10)
+    min_size = np.int(y.shape[0] * min_sample_size / 100)
 
     while y.shape[0] > min_size:
 
@@ -209,20 +199,10 @@ def random_sampling(y, z, min_sample_size=None, n_remove=None):
     # 'random_index_2remove' is smaller then 'min_sample_size', no_index
     # becomes 1 and stop the sampling
 
-    if min_sample_size is None:
-        min_size = np.int(y.shape[0] / 10)
-    else:
-        min_size = np.int(y.shape[0] * min_sample_size / 100)
+    n_remove = _ensure_int_positive(n_remove, default=4)
 
-    if isinstance(n_remove, (list, tuple, str, np.ndarray)) or n_remove < 0:
-        raise TypeError("n_remove keyword has an unhandled type: %s"
-                        % n_remove.__class__ +  " or it is not positive")
-
-
-    if n_remove is None:
-        n_remove = 4
-    if isinstance(n_remove, float):
-        n_remove = int(n_remove)
+    min_sample_size = _ensure_int_positive(min_sample_size, default=10)
+    min_size = np.int(y.shape[0] * min_sample_size / 100)
 
     while (y.shape[0] > min_size) and (no_index == 0):
 
