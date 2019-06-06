@@ -1,10 +1,12 @@
 """
-Example for visualiation the evolution of the 'Confound isolation
+Example for visualization the evolution of the 'Confound isolation
 cross-validation' and deconfounding methods.
 In this example first we generate the data 'X', targets 'y' with direct link
 with confounds 'z'.
 Then we visualize the correlation and mutual information of each step of
 sampling.
+
+
 
 """
 import numpy as np
@@ -12,9 +14,7 @@ import matplotlib.pyplot as plt
 from joblib import Parallel, delayed
 
 from confound_prediction.data_simulation import simulate_confounded_data
-from confound_prediction.sampling import (random_index_2remove,
-                                         confound_isolating_index_2remove,
-                                         confound_isolating_sampling,
+from confound_prediction.sampling import (confound_isolating_sampling,
                                          random_sampling)
 
 from confound_prediction.deconfounding import (confound_isolating_cv,
@@ -69,27 +69,35 @@ for cv_fold in range(cv_folds):
 #     ids_rs.append(rs_cv[]), mi_rs_cv, corr_rs_cv
 # ids_rs, mi_ci_cv, corr_ci_cv
 
+# Convert lisls of list of unequal lengths to numpy array
+
+
+def list_to_array(x):
+    x_array = np.zeros([len(x), len(max(x, key = lambda a: len(a)))])
+    for i,j in enumerate(x):
+        x_array[i][0:len(j)] = j
+    return x_array
 
 
 
-mi_rs_cv = np.array(mi_rs_cv)
-corr_rs_cv = np.array(corr_rs_cv)
-mi_ci_cv = np.array(mi_ci_cv)
-corr_ci_cv = np.array(corr_ci_cv)
+mi_rs_array = np.array(mi_rs_cv)
+corr_rs_array = np.array(corr_rs_cv)
+mi_ci_array = list_to_array(mi_ci_cv)
+corr_ci_array = list_to_array(corr_ci_cv)
 
 
 
-
-# Plotting Mutul Information
+# Plotting Mutul Information and Correlation
+# Different colors represent cv_folds
 
 
 f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, sharex='col', sharey='row')
 
 
-ax1.plot(mi_rs_cv.T)
-ax2.plot(mi_ci_cv.T)
-ax3.plot(corr_rs_cv.T)
-ax4.plot(corr_ci_cv.T)
+ax1.plot(mi_rs_array.T)
+ax2.plot(mi_ci_array.T)
+ax3.plot(corr_rs_array.T)
+ax4.plot(corr_ci_array.T)
 
 axes = [ax1, ax2, ax3, ax4]
 for ax in axes:
@@ -103,10 +111,10 @@ for ax in axes:
 # ax3.yaxis.label.set_position((0, 0.1))
 # ax3.set_ylabel("Number of sampled subjects", fontsize=16)
 
-# plt.xlabel("Number of sampled subjects", fontsize=16)
 
-f.text(0.5, 0.1, 'Number of sampled subjects', va='center', ha='center',
-       fontsize=16)
+
+# f.text('Number of sampled subjects', va='center', ha='center',
+#        fontsize=16) # 0.5, 0,
 # Axes
 
 ax1.set_ylabel('Mutual\nInformation', fontsize=16)
@@ -120,7 +128,18 @@ ax2.set_title('Confound isoaltion cv', fontsize=16)
 # ax3.set_title('Random sampling', fontsize=16)
 # ax4.set_title('Confound isoaltion cv', fontsize=16)
 
-f.tight_layout()
+# plt.xlabel("Number of sampled subjects", fontsize=16,
+#            horizontalalignment='left')
+
+# ax3.set_xlabel('Number of sampled subjects', fontsize=16,
+#                horizontalalignment='left')
+
+f.text(0.5, 0.04, 'Number of sampled subjects', ha="center", va="center",
+       fontsize=16)
+
+
+
+plt.gcf().subplots_adjust(bottom=0.15, left=0.15, right=0.97)
 
 
 
