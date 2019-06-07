@@ -38,7 +38,7 @@ class DeConfounder(BaseEstimator, TransformerMixin):
         return X - X_confounds
 
 
-def confound_isolating_cv(X, y, z, random_seed=0, min_sample_size=None,
+def confound_isolating_cv(X, y, z, random_seed=None, min_sample_size=None,
                           cv_folds=10, n_remove=None):
     """
     Function that create the test and training sets, masking the samples with
