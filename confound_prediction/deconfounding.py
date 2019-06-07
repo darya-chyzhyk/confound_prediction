@@ -204,7 +204,7 @@ def confound_regressout(X, y, z, type_deconfound='out_of_sample',
 
         elif (type_deconfound is 'model_agnostic') or (type_deconfound is
                                                        'False'):
-            x_test.append([mask])
+            x_test.append(X[mask])
             x_train.append(X[~mask])
 
     return x_test, x_train, y_test, y_train, ids_test, ids_train
