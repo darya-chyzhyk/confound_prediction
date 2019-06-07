@@ -138,14 +138,15 @@ def deconfound_model_agnostic(signals, confounds):
     return signals
 
 
-def confound_regressout(X, y, z, type_deconfound, min_sample_size=None,
-                        cv_folds=10, n_remove=None):
+def confound_regressout(X, y, z, type_deconfound='out_of_sample',
+                        min_sample_size=None, cv_folds=10, n_remove=None):
     """
 
     :param X: array-like, shape (n_samples, n_features)
     :param y: array-like, shape (n_samples), target
     :param z: numpy.array, shape (n_samples), confound: list
     :param type_deconfound: str,
+        # TODO correct the possible options
         The possible options are 'model_agnostic', 'out_of_sample' and
         'False'. The default is 'out_of_sample'
     :param min_sample_size: float
