@@ -49,27 +49,27 @@ TBD
 
 ### Example: create train set and test set without confounding effect
 
-'''
+```python
 python example/
-'''
+```
 
 ### Example: compare prediction on data sampled with different deconfounding methods
 
-'''
+```python
 python example/
-'''
+```
 
 ### Example: compare prediction on the data with different confound effect
 
-'''
+```python
 python example/
-'''
+```
 
 ### Example: evolution of mutual informatio and correlation on each itteration of *confound-isolation cross-validation' method
 
-'''
+```python
 python example/
-'''
+```
 
 ## Another methods
 We also provide 2 state of the art in neuroscience deconfounding techniques:
