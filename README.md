@@ -41,6 +41,36 @@ Optional parameters
 Variables:
 * *x_test, x_train, y_test, y_train, ids_test, ids_train* - train and test of *X*, *y* and *sampled indexes*
 
+
+## Installing
+TBD
+
+## Examples
+
+### Example: create train set and test set without confounding effect
+
+'''
+python example/
+'''
+
+### Example: compare prediction on data sampled with different deconfounding methods
+
+'''
+python example/
+'''
+
+### Example: compare prediction on the data with different confound effect
+
+'''
+python example/
+'''
+
+### Example: evolution of mutual informatio and correlation on each itteration of *confound-isolation cross-validation' method
+
+'''
+python example/
+'''
+
 ## Another methods
 We also provide 2 state of the art in neuroscience deconfounding techniques:
 
