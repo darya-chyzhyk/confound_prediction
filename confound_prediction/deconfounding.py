@@ -154,7 +154,7 @@ def confound_regressout(X, y, z, type_deconfound='out_of_sample',
     :param cv_folds: int
         number of folders to mimic the cross validation
     :param n_remove: int,
-        number of the samples to be removee on each itteration of sampling,
+        number of the samples to be removeed on each iteration of sampling,
         default is 4
     :return: list of numpy.ndarray
         Deconfounded and split 'X' and 'y' to the test and train data with
