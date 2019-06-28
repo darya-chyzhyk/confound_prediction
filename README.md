@@ -50,7 +50,7 @@ TBD
 ### Example: create train set and test set without confounding effect
 
 ```python
-python example/
+python example/Example_get_testset
 ```
 
 ### Example: compare prediction on data sampled with different deconfounding methods
