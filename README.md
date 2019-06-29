@@ -43,14 +43,28 @@ Variables:
 
 
 ## Installing
-TBD
+
+### Dependences
+confound_prediction package requires:
+* Python (>= 3.5)
+* Scipy (>=1.1.0)
+* Scikit-learn (>=0.21.2)
+* Numpy (>=1.14.2)
+
+### Optional dependency:
+* Matplotlib (>=2.2.2) for example visualization
+
+### User installation
+```python
+pip install TBD
+```
 
 ## Examples
 
 ### Example: create train set and test set without confounding effect
 
 ```python
-python example/Example_get_testset
+python example/Example_get_testset.py
 ```
 
 ### Example: compare prediction on data sampled with different deconfounding methods
