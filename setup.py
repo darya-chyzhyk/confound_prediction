@@ -22,5 +22,7 @@ setup(
         'Topic :: Scientific/Engineering',
 
     ],
+    platforms='any',
+    install_requires=['scipy>=1.1.0', 'scikit-learn>=0.21.2', 'numpy', 'matplotlib']
 )
 
