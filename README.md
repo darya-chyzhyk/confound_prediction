@@ -79,12 +79,15 @@ python example/
 python example/
 ```
 
-### Example: evolution of mutual information and correlation on each itteration of *confound-isolation cross-validation' method
+### Example: evolution of mutual information and correlation on each itteration of 'confound-isolation cross-validation' method
 
 ```python
 python example/Example_compare_mutual_info_correlation.py
 ```
 
+<p align="center">
+  <img src="https://github.com/darya-chyzhyk/confound_isolating_cv/blob/master/docs/Example_compare_mutual_info_correlation.png" height="300"> 
+</p>
 
 ## Another methods
 We also provide 2 state of the art in neuroscience deconfounding techniques:
