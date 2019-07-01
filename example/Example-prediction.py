@@ -1,5 +1,11 @@
 """
-Example of prediction
+Example of prediction of 'y' from 'X' with presence of confound 'z' (direct
+link between 'y' and 'z') with 4 different deconfound strategies:
+1. Confound Isolation cross-validation method
+2. 'out_of_sample' deconfounding
+3. 'model_agnostic' deconfounding
+4. without deconfounding
+
 """
 
 import matplotlib.pyplot as plt
@@ -45,10 +51,12 @@ def model_fit_datasplit(x_train_cv, x_test_cv, y_train_cv, y_test_cv, model):
 # Simulate data
 X, y, z, = simulate_confounded_data(link_type='direct_link', n_samples=100,
                                     n_features=2)
+print('Simulated data contains ', X.shape[0], ' - samples and ', X.shape[1],
+      ' - features')
 
 # Get the train and test data with Confound Isolation cross-validation method
 x_test_cicv, x_train_cicv, y_test_cicv, y_train_cicv, _, _ = \
-    confound_isolating_cv(X, y, z, random_seed=0, min_sample_size=None,
+    confound_isolating_cv(X, y, z, random_seed=None, min_sample_size=None,
                           cv_folds=10, n_remove=None)
 
 # Get the train and test data with 'out_of_sample' deconfounding
@@ -94,8 +102,9 @@ r2s_plot = [np.array(r2s_cicv), np.array(r2s_oos), np.array(r2s_ma),
 
 
 
-labels = ['Confound isolation', 'Out-of-sample', 'Model-agnostic',
-          'Without deconfounding']
+labels = ['Confound \n isolation \n cv', 'Out-of-sample',
+          'Deconfounding \n test and train\njointly',
+          'Without \n deconfounding']
 
 fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(9, 4))
 
@@ -104,15 +113,17 @@ bplot1 = axes[0].boxplot(mae_plot,
                          vert=True,  # vertical box alignment
                          patch_artist=True,  # fill with color
                          labels=labels)  # will be used to label x-ticks
-axes[0].set_title('Rectangular box plot')
+axes[0].set_title('Mean absolute value')
 
 # notch shape box plot
 bplot2 = axes[1].boxplot(r2s_plot,
-                         notch=True,  # notch shape
                          vert=True,  # vertical box alignment
                          patch_artist=True,  # fill with color
                          labels=labels)  # will be used to label x-ticks
-axes[1].set_title('Comparison of prediction')
+
+axes[0].scatter(np.array(mae_cicv), labels[0])
+
+axes[1].set_title('R2 score')
 
 # fill with colors
 colors = ['firebrick', 'olive', 'orange', 'steelblue']
@@ -127,6 +138,40 @@ for ax in axes:
     ax.set_ylabel('Observed values')
 
 plt.show()
+
+
+
+
+for x, val, clevel in zip(xs, vals, clevels):
+    plt.scatter(x, val, c=cm.prism(clevel), alpha=0.4)
+
+#------
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+
+# initialize dataframe
+n = 200
+ngroup = 3
+df = pd.DataFrame({'data': np.random.rand(n), 'group': map(np.floor, np.random.rand(n) * ngroup)})
+
+group = 'group'
+column = 'data'
+grouped = df.groupby(group)
+
+names, vals, xs = [], [] ,[]
+
+for i, (name, subdf) in enumerate(grouped):
+    names.append(name)
+    vals.append(subdf[column].tolist())
+    xs.append(np.random.normal(i+1, 0.04, subdf.shape[0]))
+
+plt.boxplot(vals, labels=names)
+ngroup = len(vals)
+clevels = np.linspace(0., 1., ngroup)
+
+for x, val, clevel in zip(xs, vals, clevels):
+    plt.scatter(x, val, c=cm.prism(clevel), alpha=0.4)
 
 
 
