@@ -125,7 +125,7 @@ def confound_isolating_sampling(y, z, random_seed=None, min_sample_size=None,
     :param z: numpy.array, shape (n_samples), confound
     :param random_seed: int
         Random seed used to initialize the pseudo-random number generator.
-        Can be any integer between 0 and 2**32 - 1 inclusive. Defaul is None
+        Can be any integer between 0 and 2**32 - 1 inclusive. Default is None
     :param min_sample_size: int
         Minimum sample size (in samples) to be reached, default is 10% of the
         data
