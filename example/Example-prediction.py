@@ -11,6 +11,7 @@ link between 'y' and 'z') with 4 different deconfound strategies:
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
 
 from confound_prediction.data_simulation import simulate_confounded_data
 from confound_prediction.sampling import (random_index_2remove,
@@ -104,20 +105,38 @@ df_mae = pd.DataFrame({'cicv': mae_cicv,
                        'oos': mae_oos,
                        'ma': mae_ma,
                        'fa': mae_fa})
-df1 = pd.melt(df_mae.reset_index(), value_vars=df_mae.columns.values.tolist(),
-        var_name='confound', value_name='value')
+df_mae_plot = pd.melt(df_mae.reset_index(),
+                      value_vars=df_mae.columns.values.tolist(),
+                      var_name='confound', value_name='value')
 
-
-
-import seaborn as sns
-sns.set(style="whitegrid")
-tips = sns.load_dataset("tips")
-ax = sns.boxplot(x="day", y="total_bill", data=tips)
-
+df_r2s = pd.DataFrame({'cicv': r2s_cicv,
+                       'oos': r2s_oos,
+                       'ma': r2s_ma,
+                       'fa': r2s_fa})
+df_r2s_plot = pd.melt(df_r2s.reset_index(),
+                      value_vars=df_r2s.columns.values.tolist(),
+                      var_name='confound', value_name='value')
 
 
 # Plotting
+fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(9, 4))
 
+# MAE
+sns.boxplot(x="confound", y="value", data=df_mae_plot, palette="colorblind",
+            ax=axes[0])
+
+sns.stripplot(x="confound", y="value", data=df_mae_plot, jitter=True,
+              dodge=True, marker='o', alpha=0.7, size=12, edgecolor='black',
+              linewidth=1.5, palette="colorblind", ax=axes[0])
+
+# R2s
+
+sns.boxplot(x="confound", y="value", data=df_r2s_plot, palette="colorblind",
+            ax=axes[1])
+
+sns.stripplot(x="confound", y="value", data=df_r2s_plot, jitter=True,
+              dodge=True, marker='o', alpha=0.7, size=12, edgecolor='black',
+              linewidth=1.5, palette="colorblind", ax=axes[1])
 
 
 
@@ -144,7 +163,7 @@ axes[0].set_title('Mean absolute value', fontsize=26)
 axes[1].set_title(r'$R^2  score$', fontsize=26)
 
 # fill with colors
-colors = ['firebrick', 'olive', 'orange', 'steelblue']
+
 for bplot in (bplot1, bplot2):
     for patch, color in zip(bplot['boxes'], colors):
         patch.set_facecolor(color)
@@ -196,4 +215,26 @@ for x, val, clevel in zip(xs, vals, clevels):
 
 
 
+
+
+sns.set(style="whitegrid")
+tips = sns.load_dataset("tips")
+
+#ax = sns.boxplot(x="day", y="total_bill", data=tips)
+
+
+sns.boxplot(x="day", y="total_bill", data=tips,
+                 palette="colorblind")
+
+
+# make grouped stripplot
+sns.stripplot(x="day", y="total_bill", data=tips,
+                   jitter=True,
+                   dodge=True,
+                   marker='o',
+                   alpha=0.5,
+              size=10,
+              edgecolor='black',
+              linewidth=1,
+              palette="colorblind")
 
