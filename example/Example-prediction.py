@@ -119,24 +119,56 @@ df_r2s_plot = pd.melt(df_r2s.reset_index(),
 
 
 # Plotting
-fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(9, 4))
+fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(9, 4))
 
 # MAE
 sns.boxplot(x="confound", y="value", data=df_mae_plot, palette="colorblind",
-            ax=axes[0])
+            ax=ax1)
 
 sns.stripplot(x="confound", y="value", data=df_mae_plot, jitter=True,
               dodge=True, marker='o', alpha=0.7, size=12, edgecolor='black',
-              linewidth=1.5, palette="colorblind", ax=axes[0])
+              linewidth=1.5, palette="colorblind", ax=ax1)
 
 # R2s
 
 sns.boxplot(x="confound", y="value", data=df_r2s_plot, palette="colorblind",
-            ax=axes[1])
+            ax=ax2)
 
 sns.stripplot(x="confound", y="value", data=df_r2s_plot, jitter=True,
               dodge=True, marker='o', alpha=0.7, size=12, edgecolor='black',
-              linewidth=1.5, palette="colorblind", ax=axes[1])
+              linewidth=1.5, palette="colorblind", ax=ax2)
+
+# Tickes
+
+ax1.axhline(y=0.0, color='black', linestyle='-')
+ax2.axhline(y=0.0, color='black', linestyle='-')
+
+labels = ['Confound \n isolation cv', 'Out-of-sample',
+          'Deconfounding \n test and train\njointly',
+          'Without \n deconfounding']
+
+ax1.set_xticklabels(labels, fontsize=16, rotation=90)
+ax2.set_xticklabels(labels, fontsize=16, rotation=90)
+ax1.yaxis.set_tick_params(labelsize=14, length=5)
+ax2.yaxis.set_tick_params(labelsize=14, length=5)
+
+# Axes
+fig.suptitle('Prediction results', fontsize=26) # , x=0.2, y=0.92
+ax1.set_title('Mean absolute error', fontsize=24) # , x=0.1, y=0.8
+ax2.set_title(r'$R^2  score$', fontsize=24) # , x=0.1, y=0.8
+
+ax1.set_ylabel("Mean absolute error",fontsize=16)
+ax2.set_ylabel("R2S score",fontsize=16)
+ax1.set_xlabel("",fontsize=30)
+ax2.set_xlabel("",fontsize=30)
+
+
+plt.gcf().subplots_adjust(bottom=0.3, left=0.1, right=0.95)
+
+
+
+
+
 
 
 
