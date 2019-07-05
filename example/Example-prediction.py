@@ -14,10 +14,6 @@ import pandas as pd
 import seaborn as sns
 
 from confound_prediction.data_simulation import simulate_confounded_data
-from confound_prediction.sampling import (random_index_2remove,
-                                         confound_isolating_index_2remove,
-                                         confound_isolating_sampling,
-                                         random_sampling)
 
 from confound_prediction.deconfounding import (confound_isolating_cv,
                                                confound_regressout)
@@ -92,14 +88,11 @@ mse_ma, mae_ma, evs_ma, r2s_ma = \
 mse_fa, mae_fa, evs_fa, r2s_fa = model_fit_datasplit(x_test_fa, x_train_fa,
                                                      y_test_fa, y_train_fa,
                                                      model)
-
-
 mae_plot = [np.array(mae_cicv), np.array(mae_oos), np.array(mae_ma),
             np.array(mae_fa)]
 
 r2s_plot = [np.array(r2s_cicv), np.array(r2s_oos), np.array(r2s_ma),
             np.array(r2s_fa)]
-
 
 df_mae = pd.DataFrame({'cicv': mae_cicv,
                        'oos': mae_oos,
@@ -117,7 +110,6 @@ df_r2s_plot = pd.melt(df_r2s.reset_index(),
                       value_vars=df_r2s.columns.values.tolist(),
                       var_name='confound', value_name='value')
 
-
 # Plotting
 fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(9, 5))
 sns.set_style("whitegrid")
@@ -131,7 +123,6 @@ sns.stripplot(x="confound", y="value", data=df_mae_plot, jitter=True,
               linewidth=1.5, palette="colorblind", ax=ax1)
 
 # R2s
-
 sns.boxplot(x="confound", y="value", data=df_r2s_plot, palette="colorblind",
             ax=ax2)
 
@@ -140,7 +131,6 @@ sns.stripplot(x="confound", y="value", data=df_r2s_plot, jitter=True,
               linewidth=1.5, palette="colorblind", ax=ax2)
 
 # Tickes
-
 ax1.axhline(y=0.0, color='black', linestyle='-')
 ax2.axhline(y=0.0, color='black', linestyle='-')
 
@@ -156,7 +146,6 @@ ax1.yaxis.set_tick_params(labelsize=14, length=5)
 ax2.yaxis.set_tick_params(labelsize=14, length=5)
 
 # Axes
-#fig.suptitle('Prediction results', fontsize=26) # , x=0.2, y=0.92
 ax1.set_title('Mean absolute error', fontsize=24) # , x=0.1, y=0.8
 ax2.set_title(r'$R^2  score$', fontsize=24) # , x=0.1, y=0.8
 
@@ -164,10 +153,6 @@ ax1.set_ylabel("Mean absolute error",fontsize=16)
 ax2.set_ylabel("R2S score",fontsize=16)
 ax1.set_xlabel("",fontsize=30)
 ax2.set_xlabel("",fontsize=30)
-
-#fig.tight_layout()
-# plt.subplots_adjust(left=0.1, bottom=0.4, right=0.90, top=None, wspace=None,
-#                  hspace=0.6)
 
 plt.gcf().subplots_adjust(bottom=0.4, left=0.1, right=0.95, wspace=0.3)
 
