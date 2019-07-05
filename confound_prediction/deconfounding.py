@@ -81,7 +81,7 @@ def confound_isolating_cv(X, y, z, random_seed=None, min_sample_size=None,
     return x_test, x_train, y_test, y_train, ids_test, ids_train
 
 
-def deconfound_model_agnostic(signals, confounds):
+def deconfound_model_jointly(signals, confounds):
     """
     Adapted code from the Nilern.signal.clean code for deconfounding jointly
 
@@ -147,7 +147,7 @@ def confound_regressout(X, y, z, type_deconfound='out_of_sample',
     :param z: numpy.array, shape (n_samples), confound: list
     :param type_deconfound: str,
         # TODO correct the possible options
-        The possible options are 'model_agnostic', 'out_of_sample' and
+        The possible options are 'jointly', 'out_of_sample' and
         'False'. The default is 'out_of_sample'
     :param min_sample_size: float
         Minimum sample size to be reached, default is 10% of the data
@@ -161,7 +161,7 @@ def confound_regressout(X, y, z, type_deconfound='out_of_sample',
         the indexes test.
     """
     # TODO decide the name of of options for 'type_deconfound'
-    # Model-agnostic
+    # Jointly
     # Out - of - sample
     # Create test and train sets
     x_test = []
@@ -173,8 +173,8 @@ def confound_regressout(X, y, z, type_deconfound='out_of_sample',
     ids_sampled = []
 
     # Pre-confounding
-    if type_deconfound == 'model_agnostic':
-        X = deconfound_model_agnostic(X, z)
+    if type_deconfound == 'jointly':
+        X = deconfound_model_jointly(X, z)
 
     # Sampling
     for cv_fold in range(cv_folds):
@@ -202,8 +202,8 @@ def confound_regressout(X, y, z, type_deconfound='out_of_sample',
             x_test.append(deconfounder.transform(X[mask], z[mask]))
             x_train.append(X[~mask])
 
-        elif (type_deconfound is 'model_agnostic') or (type_deconfound is
-                                                       'False'):
+        elif (type_deconfound is 'model_jointly') or (type_deconfound is
+                                                      'False'):
             x_test.append(X[mask])
             x_train.append(X[~mask])
 
