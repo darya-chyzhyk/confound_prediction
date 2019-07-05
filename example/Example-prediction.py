@@ -3,7 +3,7 @@ Example of prediction of 'y' from 'X' with presence of confound 'z' (direct
 link between 'y' and 'z') with 4 different deconfound strategies:
 1. Confound Isolation cross-validation method
 2. 'out_of_sample' deconfounding
-3. 'model_agnostic' deconfounding
+3. 'jointly' deconfounding
 4. without deconfounding
 
 """
@@ -43,12 +43,12 @@ def model_fit_datasplit(x_train_cv, x_test_cv, y_train_cv, y_test_cv, model):
         evs.append(explained_variance_score(y_test, test_predict))
         # R^2 score
         r2s.append(r2_score(y_test, test_predict))
-    return (mse, mae, evs, r2s)
+    return mse, mae, evs, r2s
 
 
 # Simulate data
-X, y, z, = simulate_confounded_data(link_type='direct_link', n_samples=100,
-                                    n_features=2)
+X, y, z, = simulate_confounded_data(link_type='direct_link', n_samples=1000,
+                                    n_features=100)
 print('Simulated data contains ', X.shape[0], ' - samples and ', X.shape[1],
       ' - features')
 
@@ -62,9 +62,9 @@ x_test_oos, x_train_oos, y_test_oos, y_train_oos, _, _ = \
     confound_regressout(X, y, z, type_deconfound='out_of_sample',
                         min_sample_size=None, cv_folds=10, n_remove=None)
 
-# Get the train and test data with 'model_agnostic' deconfounding
+# Get the train and test data with 'jointly' deconfounding
 x_test_ma, x_train_ma, y_test_ma, y_train_ma, _, _ = \
-    confound_regressout(X, y, z, type_deconfound='model_agnostic',
+    confound_regressout(X, y, z, type_deconfound='jointly',
                         min_sample_size=None, cv_folds=10, n_remove=None)
 
 # Get the train and test data without deconfounding
@@ -134,7 +134,8 @@ sns.stripplot(x="confound", y="value", data=df_r2s_plot, jitter=True,
 ax1.axhline(y=0.0, color='black', linestyle='-')
 ax2.axhline(y=0.0, color='black', linestyle='-')
 
-labels = ['Confound \n isolation cv', 'Out-of-sample',
+labels = ['Confound \n isolation cv',
+          'Out-of-sample \n deconfounding',
           'Deconfounding \n test and train\njointly',
           'Without \n deconfounding']
 
