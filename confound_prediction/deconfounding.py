@@ -12,7 +12,7 @@ from sklearn.linear_model import LinearRegression
 from scipy import linalg
 
 from confound_prediction.sampling import (random_sampling,
-                                         confound_isolating_sampling)
+                                          confound_isolating_sampling)
 
 class DeConfounder(BaseEstimator, TransformerMixin):
     """ A transformer removing the effect of y on X using
@@ -47,9 +47,18 @@ def confound_isolating_cv(X, y, z, random_seed=None, min_sample_size=None,
     :param X: array-like, shape (n_samples, n_features)
     :param y: array-like, shape (n_samples), target
     :param z: numpy.array, shape (n_samples), confound: list
+    :param random_seed: int
+        Random seed used to initialize the pseudo-random number generator.
+        Can be any integer between 0 and 2**32 - 1 inclusive. Default is None
+    :param min_sample_size: int
+        Minimum sample size (in samples) to be reached, default is 10% of the
+        data
+    :param cv_folds: int
+        number of folders to mimic the cross validation, default is 10.
     :param n_remove: int,
         number of the samples to be removee on each itteration of sampling,
         default is 4
+
     :return: list of arrays,
         train and test of X, y and sampled indexes
     """
@@ -151,11 +160,11 @@ def confound_regressout(X, y, z, type_deconfound='out_of_sample',
         'False'. The default is 'out_of_sample'
     :param min_sample_size: float
         Minimum sample size to be reached, default is 10% of the data
-    :param cv_folds: int
-        number of folders to mimic the cross validation
     :param n_remove: int,
         number of the samples to be removeed on each iteration of sampling,
         default is 4
+    :param cv_folds: int
+        number of folders for k-cross validation
     :return: list of numpy.ndarray
         Deconfounded and split 'X' and 'y' to the test and train data with
         the indexes test.
