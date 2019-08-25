@@ -4,7 +4,17 @@
 
 Any successful prediction model may be driven by a confounding effect that is correlated with the effect of interest. It is important to control that detected associations are not driven by unwanted effects. It is common issue in in neuroscience, epidemiology, economy, agriculture, etc. 
 
-We introduce a non-parametric approach, named **“confound-isolating cross-validation”**, to control for a confounding effect in a predictive model. It is based on crafting a test set on which the effect of interest is independent from the confounding effect. 
+This module provides 3 methods to tackle confounding effects in predictive models:
+
+&nbsp; 1. Confound-isolating cross-validation
+
+&nbsp; 2. Out-of-sample deconfounding
+
+&nbsp; 3. Deconfounding test and train jointly (which should not be used, and is provided only for illustration)
+
+### Confound-isolating cross-validation
+
+“Confound-isolating cross-validation” is a non-parametric approach to control for a confounding effect in a predictive model. It is based on crafting a test set on which the effect of interest is independent from the confounding effect. 
 
 
 ### What expect from Confound_prediction?
@@ -88,14 +98,6 @@ python example/Example_compare_mutual_info_correlation.py
 <p align="center">
   <img src="https://github.com/darya-chyzhyk/confound_isolating_cv/blob/master/docs/Example_compare_mutual_info_correlation.png" height="300"> 
 </p>
-
-## Another methods
-We also provide 2 state of the art in neuroscience deconfounding techniques:
-
-&nbsp; 1. Out-of-sample deconfounding
-
-&nbsp; 2. Deconfounding test and train jointly
-
 
 ## References
 
