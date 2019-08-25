@@ -211,8 +211,7 @@ def confound_regressout(X, y, z, type_deconfound='out_of_sample',
             x_test.append(deconfounder.transform(X[mask], z[mask]))
             x_train.append(X[~mask])
 
-        elif (type_deconfound is 'model_jointly') or (type_deconfound is
-                                                      'False'):
+        elif (type_deconfound is 'jointly') or (type_deconfound is 'False'):
             x_test.append(X[mask])
             x_train.append(X[~mask])
 
