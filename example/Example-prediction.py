@@ -45,7 +45,7 @@ def model_fit_datasplit(x_train_cv, x_test_cv, y_train_cv, y_test_cv, model):
 
 
 # Simulate data
-X, y, z, = simulate_confounded_data(link_type='direct_link', n_samples=100,
+X, y, z, = simulate_confounded_data(link_type='direct_link', n_samples=1000,
                                     n_features=100)
 print('Simulated data contains ', X.shape[0], ' - samples and ', X.shape[1],
       ' - features')
@@ -115,15 +115,10 @@ df_r2s_plot = pd.melt(df_r2s.reset_index(),
 
 # Plotting
 fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(9, 5))
-# sns.set_style("whitegrid")
 sns.set_style('darkgrid', {'axes.linewidth': 2, 'axes.edgecolor': 'white'})
-# background
 for i in range(1, 16, 2):
-    ax1.axvspan(i-0.5, i+0.5, facecolor='white', zorder=-1)# alpha=0.5
-    ax2.axvspan(i - 0.5, i + 0.5, facecolor='white', zorder=-1)  # alpha=0.5
-#sns.set_style("darkgrid")
-
-
+    ax1.axvspan(i-0.5, i+0.5, facecolor='white', zorder=-1)
+    ax2.axvspan(i - 0.5, i + 0.5, facecolor='white', zorder=-1)
 
 # MAE
 sns.boxplot(x="confound", y="value", data=df_mae_plot, palette="colorblind",
@@ -158,8 +153,8 @@ ax1.yaxis.set_tick_params(labelsize=14, length=5)
 ax2.yaxis.set_tick_params(labelsize=14, length=5)
 
 # Axes
-ax1.set_title('Mean absolute error', fontsize=24) # , x=0.1, y=0.8
-ax2.set_title(r'$R^2  score$', fontsize=24) # , x=0.1, y=0.8
+ax1.set_title('Mean absolute error', fontsize=24)
+ax2.set_title(r'$R^2  score$', fontsize=24)
 
 ax1.set_ylabel("Mean absolute error",fontsize=16)
 ax2.set_ylabel("R2S score",fontsize=16)
@@ -167,4 +162,3 @@ ax1.set_xlabel("",fontsize=30)
 ax2.set_xlabel("",fontsize=30)
 
 plt.gcf().subplots_adjust(bottom=0.4, left=0.1, right=0.95, wspace=0.3)
-
