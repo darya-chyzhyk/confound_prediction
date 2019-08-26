@@ -10,7 +10,8 @@ with 3 different properties:
 
 import numpy as np
 
-def simulate_confounded_data(link_type='direct_link', n_samples=100, n_features=100):
+def simulate_confounded_data(link_type='direct_link',
+                             n_samples=100, n_features=100):
     """
 
     :param link_type: str,
