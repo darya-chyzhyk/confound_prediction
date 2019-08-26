@@ -115,7 +115,15 @@ df_r2s_plot = pd.melt(df_r2s.reset_index(),
 
 # Plotting
 fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(9, 5))
-sns.set_style("whitegrid")
+# sns.set_style("whitegrid")
+sns.set_style('darkgrid', {'axes.linewidth': 2, 'axes.edgecolor': 'white'})
+# background
+for i in range(1, 16, 2):
+    ax1.axvspan(i-0.5, i+0.5, facecolor='white', zorder=-1)# alpha=0.5
+    ax2.axvspan(i - 0.5, i + 0.5, facecolor='white', zorder=-1)  # alpha=0.5
+#sns.set_style("darkgrid")
+
+
 
 # MAE
 sns.boxplot(x="confound", y="value", data=df_mae_plot, palette="colorblind",
