@@ -29,7 +29,7 @@ def model_fit_datasplit(x_train_cv, x_test_cv, y_train_cv, y_test_cv, model):
     r2s = []
     for x_train, x_test, y_train, y_test in zip(x_train_cv, x_test_cv,
                                                 y_train_cv, y_test_cv):
-        print('Start prediction with ', model)
+        # print('Start prediction with ', model)
         model.fit(x_train, y_train)
         test_predict = model.predict(x_test)
 
@@ -45,7 +45,7 @@ def model_fit_datasplit(x_train_cv, x_test_cv, y_train_cv, y_test_cv, model):
 
 
 # Simulate data
-X, y, z, = simulate_confounded_data(link_type='direct_link', n_samples=1000,
+X, y, z, = simulate_confounded_data(link_type='direct_link', n_samples=100,
                                     n_features=100)
 print('Simulated data contains ', X.shape[0], ' - samples and ', X.shape[1],
       ' - features')
@@ -62,16 +62,16 @@ x_test_oos, x_train_oos, y_test_oos, y_train_oos, _, _ = \
     confound_regressout(X, y, z, type_deconfound='out_of_sample',
                         min_sample_size=None, cv_folds=10, n_remove=None)
 
-# Get the train and test data with 'jointly' deconfounding
-print('Deconfound jointly .....')
-x_test_jo, x_train_jo, y_test_jo, y_train_jo, _, _ = \
-    confound_regressout(X, y, z, type_deconfound='jointly',
-                        min_sample_size=None, cv_folds=10, n_remove=None)
-
 # Get the train and test data without deconfounding
 print('Without deconfounding .....')
 x_test_fa, x_train_fa, y_test_fa, y_train_fa, _, _ = \
     confound_regressout(X, y, z, type_deconfound='False',
+                        min_sample_size=None, cv_folds=10, n_remove=None)
+
+# Get the train and test data with 'jointly' deconfounding
+print('Deconfound jointly .....')
+x_test_jo, x_train_jo, y_test_jo, y_train_jo, _, _ = \
+    confound_regressout(X, y, z, type_deconfound='jointly',
                         min_sample_size=None, cv_folds=10, n_remove=None)
 
 # Prediction
@@ -85,21 +85,21 @@ mse_oos, mae_oos, evs_oos, r2s_oos = \
     model_fit_datasplit(x_test_oos, x_train_oos, y_test_oos, y_train_oos,
                         model)
 
-mse_ma, mae_ma, evs_ma, r2s_ma = \
+mse_jo, mae_jo, evs_jo, r2s_jo = \
     model_fit_datasplit(x_test_jo, x_train_jo, y_test_jo, y_train_jo, model)
 
 mse_fa, mae_fa, evs_fa, r2s_fa = model_fit_datasplit(x_test_fa, x_train_fa,
                                                      y_test_fa, y_train_fa,
                                                      model)
-mae_plot = [np.array(mae_cicv), np.array(mae_oos), np.array(mae_ma),
+mae_plot = [np.array(mae_cicv), np.array(mae_oos), np.array(mae_jo),
             np.array(mae_fa)]
 
-r2s_plot = [np.array(r2s_cicv), np.array(r2s_oos), np.array(r2s_ma),
+r2s_plot = [np.array(r2s_cicv), np.array(r2s_oos), np.array(r2s_jo),
             np.array(r2s_fa)]
 
 df_mae = pd.DataFrame({'cicv': mae_cicv,
                        'oos': mae_oos,
-                       'ma': mae_ma,
+                       'ma': mae_jo,
                        'fa': mae_fa})
 df_mae_plot = pd.melt(df_mae.reset_index(),
                       value_vars=df_mae.columns.values.tolist(),
@@ -107,7 +107,7 @@ df_mae_plot = pd.melt(df_mae.reset_index(),
 
 df_r2s = pd.DataFrame({'cicv': r2s_cicv,
                        'oos': r2s_oos,
-                       'ma': r2s_ma,
+                       'ma': r2s_jo,
                        'fa': r2s_fa})
 df_r2s_plot = pd.melt(df_r2s.reset_index(),
                       value_vars=df_r2s.columns.values.tolist(),
