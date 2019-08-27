@@ -60,6 +60,7 @@ confound_prediction package requires:
 * Scipy (>=1.1.0)
 * Scikit-learn (>=0.21.2)
 * Numpy (>=1.14.2)
+* Pytest(>=5.1.1)
 
 ### Optional dependency:
 * Matplotlib (>=2.2.2) for example visualization
