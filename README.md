@@ -63,6 +63,7 @@ confound_prediction package requires:
 
 ### Optional dependency:
 * Matplotlib (>=2.2.2) for example visualization
+* Seaborn (>=0.8) for example visualization
 
 ### User installation
 ```python
@@ -77,11 +78,15 @@ pip install TBD
 python example/Example_get_testset.py
 ```
 
-### Example: compare prediction on data sampled with different deconfounding methods
-
+### Example: compare prediction on data sampled with different deconfounding methods on the data with direct link between target and confound
+	
 ```python
-python example/
+python example/Example-prediction-different-deconfounding-direct-confound.py
 ```
+
+<p align="center">
+  <img src="https://github.com/darya-chyzhyk/confound_isolating_cv/blob/master/docs/Example-prediction-different-deconfounding-direct-confound.svg" height="300"> 
+</p>
 
 ### Example: compare prediction on the data with different confound effect
 
