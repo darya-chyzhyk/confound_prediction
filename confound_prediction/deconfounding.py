@@ -90,11 +90,11 @@ def confound_isolating_cv(X, y, z, random_seed=None, min_sample_size=None,
     return x_test, x_train, y_test, y_train, ids_test, ids_train
 
 
-def deconfound_model_jointly(signals, confounds):
+def deconfound_model_jointly(X, confounds):
     """
     Adapted code from the Nilern.signal.clean code for deconfounding jointly
 
-    :param signals: numpy.ndarray
+    :param X: numpy.ndarray
         Timeseries. Must have shape (instant number, features number).
     :param confounds:numpy.ndarray or list of Confounds timeseries.
         Shape must be (instant number, confound number), or just
@@ -108,6 +108,8 @@ def deconfound_model_jointly(signals, confounds):
 
     # TODO create _ensure_float function
     # confounds = _ensure_float(confounds)
+
+    signals = np.copy(X)
 
     # Remove confounds
     if not isinstance(confounds, (list, tuple)):
@@ -143,8 +145,8 @@ def deconfound_model_jointly(signals, confounds):
     Q, R, _ = linalg.qr(confounds, mode='economic', pivoting=True)
     Q = Q[:, np.abs(np.diag(R)) > np.finfo(np.float).eps * 100.]
     signals -= Q.dot(Q.T).dot(signals)
-    signals_deconfounded = np.copy(signals)
-    return signals_deconfounded
+    # signals_deconfounded = np.copy(signals)
+    return signals
 
 
 def confound_regressout(X, y, z, type_deconfound='out_of_sample',
