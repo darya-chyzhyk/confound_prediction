@@ -182,10 +182,8 @@ def confound_regressout(X, y, z, type_deconfound='out_of_sample',
     ids_sampled = []
 
     # Pre-confounding
-    print(X[0:10, 0])
     if type_deconfound == 'jointly':
         X = deconfound_model_jointly(X, z)
-        print(X[0:10, 0])
 
     # Sampling
     for cv_fold in range(cv_folds):
@@ -216,6 +214,5 @@ def confound_regressout(X, y, z, type_deconfound='out_of_sample',
         elif (type_deconfound is 'jointly') or (type_deconfound is 'False'):
             x_test.append(X[mask])
             x_train.append(X[~mask])
-    print(X[0:10, 0])
     return x_test, x_train, y_test, y_train, ids_test, ids_train
 
