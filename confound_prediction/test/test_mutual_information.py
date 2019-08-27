@@ -6,7 +6,6 @@ from confound_prediction.mutual_information import (_entropy,
                                                    mutual_kde)
 
 
-
 def test_entropy():
     # Testing against correlated Gaussian variables
     # (analytical results are known)
@@ -70,7 +69,7 @@ def test_mutual_kde():
 
     np.random.seed(42)
     x_uncorr, y_uncorr = np.random.multivariate_normal(means, covs, 1000).T
-    mutual_uncorr = mutual_kde(x_uncorr, y_uncorr, type_bandwidth='scott')
+    mutual_uncorr = mutual_kde(x_uncorr, y_uncorr)
 
     #print('Mutual information uncorrelated variables: ',
 
@@ -85,6 +84,6 @@ def test_mutual_kde():
     # x, y = np.random.multivariate_normal(means, covs, 1000).T
     np.random.seed(42)
     x_corr, y_corr = np.random.multivariate_normal(means, covs, 1000).T
-    mutual_corr = mutual_kde(x_corr, y_corr, type_bandwidth='scott')
+    mutual_corr = mutual_kde(x_corr, y_corr)
     assert mutual_corr >= 0
     assert mutual_corr > mutual_uncorr
