@@ -1,11 +1,10 @@
 """
-Example of prediction of 'y' from 'X' with presence of confound 'z' (direct
-link between 'y' and 'z') with 4 different deconfound strategies:
-1. Confound Isolation cross-validation method
-2. 'Out_of_sample' deconfounding
-3. 'Jointly' deconfounding
-4. Without deconfounding
-
+Example of prediction of 'y' from 'X' with presence of confound 'z':
+1. "direct link"
+2. "weak_link"
+3. "no_link"
+The link is between 'y' and 'z'.
+We are using "Confound Isolation cross-validation method.
 """
 
 import matplotlib.pyplot as plt
@@ -45,70 +44,57 @@ def model_fit_datasplit(x_train_cv, x_test_cv, y_train_cv, y_test_cv, model):
 
 
 # Simulate data
-X, y, z, = simulate_confounded_data(link_type='direct_link', n_samples=1000,
-                                    n_features=100)
-print('Simulated data contains ', X.shape[0], ' - samples and ', X.shape[1],
-      ' - features')
+X_direct, y_direct, z_direct = simulate_confounded_data(
+    link_type='direct_link', n_samples=100, n_features=1000)
 
-# Get the train and test data with Confound Isolation cross-validation method
+X_weak, y_weak, z_weak = simulate_confounded_data(link_type='weak_link',
+                                                  n_samples=100,
+                                                  n_features=1000)
+
+X_no, y_no, z_no = simulate_confounded_data(link_type='no_link',
+                                            n_samples=100, n_features=1000)
+
 print('Confound Isolation cross-validation method is processing.....')
-x_test_cicv, x_train_cicv, y_test_cicv, y_train_cicv, _, _ = \
-    confound_isolating_cv(X, y, z, random_seed=None, min_sample_size=None,
-                          cv_folds=10, n_remove=None)
+x_test_direct, x_train_direct, y_test_direct, y_train_direct, _, _ = \
+    confound_isolating_cv(X_direct, y_direct, z_direct, cv_folds=10)
 
-# Get the train and test data with 'out_of_sample' deconfounding
-print('Out_of_sample deconfounding method is processing.....')
-x_test_oos, x_train_oos, y_test_oos, y_train_oos, _, _ = \
-    confound_regressout(X, y, z, type_deconfound='out_of_sample',
-                        min_sample_size=None, cv_folds=10, n_remove=None)
+x_test_weak, x_train_weak, y_test_weak, y_train_weak, _, _ = \
+    confound_isolating_cv(X_weak, y_weak, z_weak, cv_folds=10)
 
-# Get the train and test data without deconfounding
-print('Without deconfounding .....')
-x_test_fa, x_train_fa, y_test_fa, y_train_fa, _, _ = \
-    confound_regressout(X, y, z, type_deconfound='False',
-                        min_sample_size=None, cv_folds=10, n_remove=None)
-
-# Get the train and test data with 'jointly' deconfounding
-print('Deconfound jointly .....')
-x_test_jo, x_train_jo, y_test_jo, y_train_jo, _, _ = \
-    confound_regressout(X, y, z, type_deconfound='jointly',
-                        min_sample_size=None, cv_folds=10, n_remove=None)
+x_test_no, x_train_no, y_test_no, y_train_no, _, _ = \
+    confound_isolating_cv(X_no, y_no, z_no, cv_folds=10)
 
 # Prediction
 model = RidgeCV()
 
-mse_cicv, mae_cicv, evs_cicv, r2s_cicv = \
-    model_fit_datasplit(x_test_cicv, x_train_cicv, y_test_cicv, y_train_cicv,
+mse_direct, mae_direct, evs_direct, r2s_direct = \
+    model_fit_datasplit(x_test_direct, x_train_direct, y_test_direct,
+                        y_train_direct, model)
+
+mse_weak, mae_weak, evs_weak, r2s_weak = \
+    model_fit_datasplit(x_test_weak, x_train_weak, y_test_weak, y_train_weak,
                         model)
 
-mse_oos, mae_oos, evs_oos, r2s_oos = \
-    model_fit_datasplit(x_test_oos, x_train_oos, y_test_oos, y_train_oos,
-                        model)
-
-mse_jo, mae_jo, evs_jo, r2s_jo = \
-    model_fit_datasplit(x_test_jo, x_train_jo, y_test_jo, y_train_jo, model)
-
-mse_fa, mae_fa, evs_fa, r2s_fa = model_fit_datasplit(x_test_fa, x_train_fa,
-                                                     y_test_fa, y_train_fa,
+mse_no, mae_no, evs_no, r2s_no = model_fit_datasplit(x_test_no, x_train_no,
+                                                     y_test_no, y_train_no,
                                                      model)
-mae_plot = [np.array(mae_cicv), np.array(mae_oos), np.array(mae_jo),
-            np.array(mae_fa)]
 
-r2s_plot = [np.array(r2s_cicv), np.array(r2s_oos), np.array(r2s_jo),
-            np.array(r2s_fa)]
 
-df_mae = pd.DataFrame({'cicv': mae_cicv,
-                       'oos': mae_oos,
-                       'ma': mae_jo,
-                       'fa': mae_fa})
+#######
+mae_plot = [np.array(mae_direct), np.array(mae_weak), np.array(mae_no)]
+
+r2s_plot = [np.array(r2s_direct), np.array(r2s_weak), np.array(r2s_no)]
+
+df_mae = pd.DataFrame({'direct': mae_direct,
+                       'weak': mae_weak,
+                       'no': mae_no})
 df_mae_plot = pd.melt(df_mae.reset_index(),
                       value_vars=df_mae.columns.values.tolist(),
                       var_name='confound', value_name='value')
 
-df_r2s = pd.DataFrame({'cicv': r2s_cicv,
-                       'oos': r2s_oos,
-                       'ma': r2s_jo,
-                       'fa': r2s_fa})
+df_r2s = pd.DataFrame({'direct': r2s_direct,
+                       'weak': r2s_weak,
+                       'no': r2s_no})
 df_r2s_plot = pd.melt(df_r2s.reset_index(),
                       value_vars=df_r2s.columns.values.tolist(),
                       var_name='confound', value_name='value')
@@ -140,10 +126,9 @@ sns.stripplot(x="confound", y="value", data=df_r2s_plot, jitter=True,
 ax1.axhline(y=0.0, color='black', linestyle='-')
 ax2.axhline(y=0.0, color='black', linestyle='-')
 
-labels = ['Confound \n isolation cv',
-          'Out-of-sample \n deconfounding',
-          'Deconfounding \n test and train\njointly',
-          'Without \n deconfounding']
+labels = ['Strong link',
+          'Weak link',
+          'No link']
 
 ax1.set_xticklabels(labels, fontsize=16, rotation=70)
 ax2.set_xticklabels(labels, fontsize=16, rotation=70)
