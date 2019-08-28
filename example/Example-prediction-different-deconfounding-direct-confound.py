@@ -45,7 +45,7 @@ def model_fit_datasplit(x_train_cv, x_test_cv, y_train_cv, y_test_cv, model):
 
 
 # Simulate data
-X, y, z, = simulate_confounded_data(link_type='direct_link', n_samples=100,
+X, y, z, = simulate_confounded_data(link_type='direct_link', n_samples=1000,
                                     n_features=100)
 print('Simulated data contains ', X.shape[0], ' - samples and ', X.shape[1],
       ' - features')
