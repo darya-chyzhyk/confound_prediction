@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="confound_prediction",
-    version="0.0.1",
+    version="0.0.1a",
     author="Darya Chyzhyk",
     author_email="darya.chyzhyk@gmail.com",
     description="Confound-isolating cross-validation approach to control for a "
