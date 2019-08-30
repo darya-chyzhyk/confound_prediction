@@ -1,0 +1,26 @@
+include LICENSE.txt
+include README.md
+include .gitignore
+include .travis.yml
+global-exclude *.py[co]
+exclude examples
+exclude docs
+
+
+
+include *.txt
+include *.rst
+include LICENSE
+recursive-include examples *.py 
+include CHANGES.rst
+
+
+recursive-include examples *.py
+recursive-include modl *.c *.h *.pyx *.pxd
+recursive-include misc *
+include LICENSE
+include README.md
+include requirements.txt
+
+
+
