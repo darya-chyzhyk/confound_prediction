@@ -92,7 +92,12 @@ python example/Example-prediction-different-deconfounding-direct-confound.py
 ### Example: compare prediction on the data with different confound effect
 
 ```python
-python example/
+python example/Example-prediction-isolatingcv-deconfounding-dif-confound.py
+```
+
+<p align="center">
+  <img src="https://github.com/darya-chyzhyk/confound_isolating_cv/blob/master/docs/Example-prediction-isolatingcv-deconfounding-dif-confound.svg" height="300"> 
+</p>
 ```
 
 ### Example: evolution of mutual information and correlation on each itteration of 'confound-isolation cross-validation' method
