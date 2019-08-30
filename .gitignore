@@ -1,0 +1,14 @@
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# OS generated files 
+.idea
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# coverage
+.coverage*
+
+
